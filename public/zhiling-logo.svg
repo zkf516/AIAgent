@@ -1,0 +1,38 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#06D6A0"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="40" x2="48" y2="8" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#06D6A0"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="40" height="40" rx="20" fill="#101828"/>
+  <!-- 现代科技感渐变圆环+智能核心+流畅线条 -->
+  <g>
+    <defs>
+      <radialGradient id="core" cx="24" cy="24" r="12" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#fff" stop-opacity="0.95"/>
+        <stop offset="1" stop-color="#38BDF8" stop-opacity="0.2"/>
+      </radialGradient>
+      <linearGradient id="ring" x1="12" y1="12" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#3B82F6"/>
+        <stop offset="1" stop-color="#06D6A0"/>
+      </linearGradient>
+    </defs>
+    <!-- 渐变圆环 -->
+    <circle cx="24" cy="24" r="16" fill="none" stroke="url(#ring)" stroke-width="3.5"/>
+    <!-- 智能体核心 -->
+    <circle cx="24" cy="24" r="7.5" fill="url(#core)" stroke="#06D6A0" stroke-width="1.2"/>
+    <!-- 流畅科技感线条 -->
+    <path d="M14 24c0-6 8-10 10-4s8 2 10 4" stroke="#3B82F6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M24 14c6 0 10 8 4 10s-2 8-4 10" stroke="#06D6A0" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- 点缀节点 -->
+    <circle cx="14" cy="24" r="1.5" fill="#3B82F6"/>
+    <circle cx="34" cy="24" r="1.5" fill="#06D6A0"/>
+    <circle cx="24" cy="14" r="1.5" fill="#60A5FA"/>
+    <circle cx="24" cy="34" r="1.5" fill="#38BDF8"/>
+  </g>
+</svg>

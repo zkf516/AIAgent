@@ -1,0 +1,39 @@
+# Node
+node_modules/
+
+# IDE/Editor
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Log/Temp
+*.log
+npm-debug.log*
+yarn-error.log
+
+# Env
+.env*
+
+# Others
+package-lock.json
+
+# Android/Capacitor
+/android/
+
+# Mac/Windows
+*.swp
+*.swo
+
+# Optional: coverage, test output
+/coverage/
+
+# Optional: OS generated
+*.bak
+*.tmp
+
+# Optional: local config
+*.local.js
+*.local.json
