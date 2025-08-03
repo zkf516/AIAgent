@@ -8,14 +8,21 @@
   </div>
   <div class="container" :class="{ 'sidebar-collapsed': !showSidebar }">
     <!-- 左侧功能区 -->
-    <SidebarHistory
-      v-show="showSidebar"
-      :conversations="conversations"
-      :activeConvId="activeConvId"
-      @add-conversation="addConversation"
-      @select-conversation="selectConversation"
-      @go-user-info="goUserInfo"
-    />
+    <div :class="['sidebar-outer', { collapsed: collapsedSidebar }]">
+      <div
+        :class="['sidebar-abs', { collapsed: !showSidebar }]"
+        ref="sidebarAbsRef"
+        @transitionend="onSidebarAbsTransitionEnd"
+      >
+        <SidebarHistory
+          :conversations="conversations"
+          :activeConvId="activeConvId"
+          @add-conversation="addConversation"
+          @select-conversation="selectConversation"
+          @go-user-info="goUserInfo"
+        />
+      </div>
+    </div>
     <!-- 主聊天区 -->
     <div class="main-content">
       <div class="top-bar">
@@ -74,15 +81,28 @@
       </div>
       <!-- 输入区域 -->
       <div class="input-container">
-        <div class="input-box">
-          <div class="input-tools">
+        <div class="input-box input-box-vertical">
+          <div class="input-tools input-tools-row">
             <div class="input-tool"><i class="fas fa-plus"></i></div>
             <div class="input-tool"><i class="fas fa-image"></i></div>
             <div class="input-tool"><i class="fas fa-file-upload"></i></div>
-            <div class="input-tool"><i class="fas fa-microphone"></i></div>
+            <div class="input-tool" :class="{ recording: recognizing }" @click="startVoiceInput" title="语音输入"><i class="fas fa-microphone"></i></div>
           </div>
-          <textarea v-model="input" ref="inputRef" placeholder="输入消息..." rows="1" @input="autoResize" @keydown.enter.exact.prevent="send" @keydown.enter.shift="insertNewline"></textarea>
-          <button class="send-btn" @click="send"><i class="fas fa-paper-plane"></i></button>
+          <div class="input-bottom-row">
+            <textarea v-model="input" ref="inputRef" placeholder="输入消息..." rows="1" @input="autoResize" @keydown.enter.exact.prevent="send" @keydown.enter.shift="insertNewline"></textarea>
+            <button class="send-btn" @click="send">
+              <template v-if="!recognizing">
+                <i class="fas fa-paper-plane"></i>
+              </template>
+              <template v-else>
+                <span class="voice-ellipsis">
+                  <span class="voice-dot"></span>
+                  <span class="voice-dot"></span>
+                  <span class="voice-dot"></span>
+                </span>
+              </template>
+            </button>
+          </div>
         </div>
       </div>
       <!-- 功能面板 -->
@@ -166,9 +186,66 @@ const chatListRef = ref(null)
 const inputRef = ref(null)
 const showFunctionPanel = ref(false)
 const showTyping = ref(false)
-const showSidebar = ref(true)
+// 语音识别相关
+const recognizing = ref(false)
+let recognition = null
+
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SpeechRecognition) {
+    alert('当前浏览器不支持语音识别')
+    return null
+  }
+  const recog = new SpeechRecognition()
+  recog.lang = 'zh-CN'
+  recog.continuous = false
+  recog.interimResults = false
+  recog.onstart = () => { recognizing.value = true }
+  recog.onend = () => { recognizing.value = false }
+  recog.onerror = (e) => {
+    recognizing.value = false
+    alert('语音识别出错：' + e.error)
+  }
+  recog.onresult = (e) => {
+    const txt = Array.from(e.results).map(r => r[0].transcript).join('')
+    input.value = txt
+  }
+  return recog
+}
+
+function startVoiceInput() {
+  if (recognizing.value) {
+    recognition && recognition.stop()
+    return
+  }
+  if (!recognition) recognition = initSpeechRecognition()
+  if (recognition) recognition.start()
+}
+// 分步动画：先淡出内容，再收缩宽度
+const showSidebar = ref(true) // 控制内容淡入淡出
+const collapsedSidebar = ref(false) // 控制宽度收缩
+const sidebarAbsRef = ref(null)
+
 function toggleSidebar() {
-  showSidebar.value = !showSidebar.value
+  if (showSidebar.value) {
+    // 先淡出内容
+    showSidebar.value = false
+    // 等待动画结束后再收缩宽度
+  } else {
+    // 先展开宽度
+    collapsedSidebar.value = false
+    // 下一帧再淡入内容
+    nextTick(() => {
+      showSidebar.value = true
+    })
+  }
+}
+
+function onSidebarAbsTransitionEnd(e) {
+  if (e.propertyName === 'opacity' && !showSidebar.value) {
+    // 内容淡出动画结束，收缩宽度
+    collapsedSidebar.value = true
+  }
 }
 
 const activeMessages = computed(() => {
@@ -254,7 +331,6 @@ function toggleFunctionPanel() {
 
 
 <style scoped>
-/* 仅保留必要的定位和结构样式，所有布局、色彩、字体等交给全局style.css */
 .bg-effects {
   position: absolute;
   width: 100%;
@@ -269,22 +345,125 @@ function toggleFunctionPanel() {
 .markdown-body {
   word-break: break-word;
 }
-
 .list-toggle-btn {
   margin-right: 8px;
 }
-
-.sidebar-collapsed .sidebar {
-  display: none !important;
+.sidebar-outer {
+  width: 260px;
+  min-width: 0;
+  max-width: 260px;
+  transition: width 0.3s cubic-bezier(.55,0,.1,1), margin-right 0.3s cubic-bezier(.55,0,.1,1);
+  overflow: visible;
+  will-change: width, margin-right;
+  position: relative;
+  flex-shrink: 0;
+  margin-right: 15px;
+  opacity: 1;
 }
-.sidebar-collapsed .main-content {
-  margin-left: 0 !important;
-  transition: margin-left 0.3s;
+.sidebar-outer.collapsed {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  padding: 0;
+  margin-right: 0;
+  /* 不再控制 opacity，pointer-events 依然关闭 */
+  pointer-events: none;
 }
-.container {
-  transition: all 0.3s;
+.sidebar-abs {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 260px;
+  height: 100%;
+  transition: opacity 0.3s cubic-bezier(.55,0,.1,1);
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  pointer-events: auto;
 }
-.sidebar + .main-content {
-  transition: margin-left 0.3s;
+.sidebar-abs.collapsed {
+  opacity: 0;
+  pointer-events: none;
+}
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: none;
+}
+/* 语音识别时发送按钮跳动省略号动画 */
+.send-btn {
+  /* ...existing code... */
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* 语音识别发送按钮的3个白色大圆点动画 */
+.voice-ellipsis {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+}
+.voice-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  display: inline-block;
+  animation: ellipsis-bounce 1.2s infinite;
+}
+.voice-dot:nth-child(1) { animation-delay: 0s; }
+.voice-dot:nth-child(2) { animation-delay: 0.2s; }
+.voice-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ellipsis-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 1; }
+  40% { transform: translateY(-6px); opacity: 0.7; }
+}
+/* 语音录入高亮动画 */
+.input-tool.recording {
+  color: var(--primary);
+  animation: pulse 1s infinite;
+}
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 0 var(--primary)); }
+  50% { filter: drop-shadow(0 0 8px var(--primary)); }
+  100% { filter: drop-shadow(0 0 0 var(--primary)); }
+}
+</style>
+<style scoped>
+/* 输入区上下结构样式 */
+.input-box-vertical {
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  max-width: 720px;
+  width: 100%;
+}
+.input-tools-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-right: 0;
+  height: 32px;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+.input-bottom-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+.input-bottom-row textarea {
+  margin: 0;
 }
 </style>

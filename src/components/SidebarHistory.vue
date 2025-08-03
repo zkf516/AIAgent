@@ -1,20 +1,22 @@
 <template>
-  <div class="sidebar">
-    <div class="logo">
-      <div class="logo-icon">
-        <i class="fas fa-brain"></i>
+  <div class="sidebar sidebar-flex">
+    <div>
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-brain"></i>
+        </div>
+        <div class="logo-text">智灵联动</div>
       </div>
-      <div class="logo-text">智灵联动</div>
-    </div>
-    <button class="new-chat-btn" @click="$emit('add-conversation')">
-      <i class="fas fa-plus"></i>
-      <span>新对话</span>
-    </button>
-    <div class="history-title">最近对话</div>
-    <div class="history-list">
-      <div v-for="conv in conversations" :key="conv.id" :class="['history-item', {active: conv.id===activeConvId}]" @click="$emit('select-conversation', conv.id)">
-        <i class="fas fa-comment"></i>
-        <span class="history-text">{{ conv.title }}</span>
+      <button class="new-chat-btn full-width" @click="$emit('add-conversation')">
+        <i class="fas fa-plus"></i>
+        <span>新对话</span>
+      </button>
+      <div class="history-title">最近对话</div>
+      <div class="history-list">
+        <div v-for="conv in conversations" :key="conv.id" :class="['history-item', {active: conv.id===activeConvId}]" @click="$emit('select-conversation', conv.id)">
+          <i class="fas fa-comment"></i>
+          <span class="history-text">{{ conv.title }}</span>
+        </div>
       </div>
     </div>
     <div class="bottom-menu">
@@ -42,5 +44,16 @@ const props = defineProps({
 </script>
 
 <style scoped>
-/* 结构样式如有需要可补充 */
+.sidebar-flex {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.bottom-menu {
+  margin-top: auto;
+}
+.full-width {
+  width: 100%;
+  box-sizing: border-box;
+}
 </style>
