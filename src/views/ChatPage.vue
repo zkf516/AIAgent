@@ -1,5 +1,3 @@
-
-
 <template>
   <!-- 背景效果 -->
   <div class="bg-effects">
@@ -81,29 +79,13 @@
       </div>
       <!-- 输入区域 -->
       <div class="input-container">
-        <div class="input-box input-box-vertical">
-          <div class="input-tools input-tools-row">
-            <div class="input-tool"><i class="fas fa-plus"></i></div>
-            <div class="input-tool"><i class="fas fa-image"></i></div>
-            <div class="input-tool"><i class="fas fa-file-upload"></i></div>
-            <div class="input-tool" :class="{ recording: recognizing }" @click="startVoiceInput" title="语音输入"><i class="fas fa-microphone"></i></div>
-          </div>
-          <div class="input-bottom-row">
-            <textarea v-model="input" ref="inputRef" placeholder="输入消息..." rows="1" @input="autoResize" @keydown.enter.exact.prevent="send" @keydown.enter.shift="insertNewline"></textarea>
-            <button class="send-btn" @click="send">
-              <template v-if="!recognizing">
-                <i class="fas fa-paper-plane"></i>
-              </template>
-              <template v-else>
-                <span class="voice-ellipsis">
-                  <span class="voice-dot"></span>
-                  <span class="voice-dot"></span>
-                  <span class="voice-dot"></span>
-                </span>
-              </template>
-            </button>
-          </div>
-        </div>
+        <ChatInputBox
+          :input="input"
+          :recognizing="recognizing"
+          @update:input="val => { input = val }"
+          @send="send"
+          @startVoiceInput="startVoiceInput"
+        />
       </div>
       <!-- 功能面板 -->
       <div class="function-panel" :class="{active: showFunctionPanel}">
@@ -134,6 +116,7 @@ import { useRouter } from 'vue-router'
 import MarkdownIt from 'markdown-it'
 import { defineComponent, h } from 'vue'
 import SidebarHistory from '../components/SidebarHistory.vue'
+import ChatInputBox from '../components/ChatInputBox.vue'
 // markdown渲染组件
 const md = new MarkdownIt({
   html: false,
@@ -183,7 +166,7 @@ const conversations = ref([
 const activeConvId = ref(1)
 const input = ref('')
 const chatListRef = ref(null)
-const inputRef = ref(null)
+// const inputRef = ref(null) // 已由ChatInputBox内部管理
 const showFunctionPanel = ref(false)
 const showTyping = ref(false)
 // 语音识别相关
@@ -222,8 +205,8 @@ function startVoiceInput() {
   if (recognition) recognition.start()
 }
 // 分步动画：先淡出内容，再收缩宽度
-const showSidebar = ref(true) // 控制内容淡入淡出
-const collapsedSidebar = ref(false) // 控制宽度收缩
+const showSidebar = ref(false) // 控制内容淡入淡出，默认关闭
+const collapsedSidebar = ref(true) // 控制宽度收缩，默认收缩
 const sidebarAbsRef = ref(null)
 
 function toggleSidebar() {
@@ -270,36 +253,12 @@ function send() {
   showTyping.value = true
   const userInput = input.value
   input.value = ''
-  nextTick(() => {
-    if (inputRef.value) {
-      inputRef.value.style.height = '24px'
-    }
-  })
+  // 清空输入后重置高度由ChatInputBox内部处理
   setTimeout(() => {
     conv.messages.push({ id: Date.now() + 1, role: 'ai', text: '感谢您的提问！这是一个模拟的AI回复。在实际应用中，这里会显示AI生成的回答。' })
     showTyping.value = false
     scrollToBottom()
   }, 1000)
-}
-
-function insertNewline(e) {
-  // Shift+Enter 换行
-  if (inputRef.value) {
-    const el = inputRef.value
-    const start = el.selectionStart
-    const end = el.selectionEnd
-    input.value = input.value.slice(0, start) + '\n' + input.value.slice(end)
-    nextTick(() => {
-      el.selectionStart = el.selectionEnd = start + 1
-    })
-  }
-}
-
-function autoResize() {
-  if (inputRef.value) {
-    inputRef.value.style.height = 'auto'
-    inputRef.value.style.height = inputRef.value.scrollHeight + 'px'
-  }
 }
 
 function addConversation() {
@@ -390,80 +349,5 @@ function toggleFunctionPanel() {
   display: flex;
   flex-direction: column;
   transition: none;
-}
-/* 语音识别时发送按钮跳动省略号动画 */
-.send-btn {
-  /* ...existing code... */
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-/* 语音识别发送按钮的3个白色大圆点动画 */
-.voice-ellipsis {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 0;
-}
-.voice-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #fff;
-  display: inline-block;
-  animation: ellipsis-bounce 1.2s infinite;
-}
-.voice-dot:nth-child(1) { animation-delay: 0s; }
-.voice-dot:nth-child(2) { animation-delay: 0.2s; }
-.voice-dot:nth-child(3) { animation-delay: 0.4s; }
-@keyframes ellipsis-bounce {
-  0%, 80%, 100% { transform: translateY(0); opacity: 1; }
-  40% { transform: translateY(-6px); opacity: 0.7; }
-}
-/* 语音录入高亮动画 */
-.input-tool.recording {
-  color: var(--primary);
-  animation: pulse 1s infinite;
-}
-@keyframes pulse {
-  0% { filter: drop-shadow(0 0 0 var(--primary)); }
-  50% { filter: drop-shadow(0 0 8px var(--primary)); }
-  100% { filter: drop-shadow(0 0 0 var(--primary)); }
-}
-</style>
-<style scoped>
-/* 输入区上下结构样式 */
-.input-box-vertical {
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 12px;
-  max-width: 720px;
-  width: 100%;
-}
-.input-tools-row {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  margin-right: 0;
-  height: 32px;
-  padding-bottom: 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 8px;
-}
-.input-bottom-row {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-}
-.input-bottom-row textarea {
-  margin: 0;
 }
 </style>
