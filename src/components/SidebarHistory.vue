@@ -1,8 +1,7 @@
 <template>
-  <!-- 只保留一份sidebar结构，彻底去重 -->
-  <div :class="['sidebar-outer', { collapsed: collapsedSidebar }]">
+  <div :class="['sidebar-outer', { collapsed: isSidebarCollapsed }]">
     <div
-      :class="['sidebar-abs', { collapsed: !showSidebar }]"
+      :class="['sidebar-abs', { collapsed: !isContentVisible }]"
       ref="sidebarAbsRef"
       @transitionend="onSidebarAbsTransitionEnd"
     >
@@ -46,19 +45,36 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 const props = defineProps({
   conversations: Array,
   activeConvId: Number,
-  showSidebar: Boolean,
-  collapsedSidebar: Boolean
+  showSidebar: Boolean
 })
-const emits = defineEmits(['update:showSidebar', 'update:collapsedSidebar'])
+const emits = defineEmits(['add-conversation', 'select-conversation', 'go-user-info'])
 const sidebarAbsRef = ref(null)
+// 内部动画状态
+const isContentVisible = ref(false) // 控制内容淡入淡出
+const isSidebarCollapsed = ref(true) // 控制宽度收缩
+
+// 监听外部showSidebar变化，驱动动画
+watch(() => props.showSidebar, (val) => {
+  if (val) {
+    // 展开：先展开宽度，再淡入内容
+    isSidebarCollapsed.value = false
+    nextTick(() => {
+      isContentVisible.value = true
+    })
+  } else {
+    // 收起：先淡出内容，动画结束后再收缩宽度
+    isContentVisible.value = false
+  }
+})
 
 function onSidebarAbsTransitionEnd(e) {
-  if (e.propertyName === 'opacity' && !props.showSidebar) {
-    emits('update:collapsedSidebar', true)
+  // 内容淡出动画结束后收缩宽度
+  if (e.propertyName === 'opacity' && !isContentVisible.value) {
+    isSidebarCollapsed.value = true
   }
 }
 </script>

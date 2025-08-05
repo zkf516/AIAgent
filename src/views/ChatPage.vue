@@ -10,9 +10,6 @@
       :conversations="conversations"
       :activeConvId="activeConvId"
       :showSidebar="showSidebar"
-      :collapsedSidebar="collapsedSidebar"
-      @update:showSidebar="val => showSidebar = val"
-      @update:collapsedSidebar="val => collapsedSidebar = val"
       @add-conversation="addConversation"
       @select-conversation="selectConversation"
       @go-user-info="goUserInfo"
@@ -200,19 +197,10 @@ function startVoiceInput() {
   if (!recognition) recognition = initSpeechRecognition()
   if (recognition) recognition.start()
 }
-// 分步动画：先淡出内容，再收缩宽度，由SidebarHistory内部实现
-const showSidebar = ref(false) // 控制内容淡入淡出，默认关闭
-const collapsedSidebar = ref(true) // 控制宽度收缩，默认收缩
-// toggleSidebar 逻辑保留，用于按钮
+// showSidebar控制侧边栏显示
+const showSidebar = ref(false)
 function toggleSidebar() {
-  if (showSidebar.value) {
-    showSidebar.value = false
-  } else {
-    collapsedSidebar.value = false
-    nextTick(() => {
-      showSidebar.value = true
-    })
-  }
+  showSidebar.value = !showSidebar.value
 }
 
 const activeMessages = computed(() => {
