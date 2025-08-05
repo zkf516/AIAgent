@@ -6,21 +6,17 @@
   </div>
   <div class="container" :class="{ 'sidebar-collapsed': !showSidebar }">
     <!-- 左侧功能区 -->
-    <div :class="['sidebar-outer', { collapsed: collapsedSidebar }]">
-      <div
-        :class="['sidebar-abs', { collapsed: !showSidebar }]"
-        ref="sidebarAbsRef"
-        @transitionend="onSidebarAbsTransitionEnd"
-      >
-        <SidebarHistory
-          :conversations="conversations"
-          :activeConvId="activeConvId"
-          @add-conversation="addConversation"
-          @select-conversation="selectConversation"
-          @go-user-info="goUserInfo"
-        />
-      </div>
-    </div>
+    <SidebarHistory
+      :conversations="conversations"
+      :activeConvId="activeConvId"
+      :showSidebar="showSidebar"
+      :collapsedSidebar="collapsedSidebar"
+      @update:showSidebar="val => showSidebar = val"
+      @update:collapsedSidebar="val => collapsedSidebar = val"
+      @add-conversation="addConversation"
+      @select-conversation="selectConversation"
+      @go-user-info="goUserInfo"
+    />
     <!-- 主聊天区 -->
     <div class="main-content">
       <div class="top-bar">
@@ -204,30 +200,18 @@ function startVoiceInput() {
   if (!recognition) recognition = initSpeechRecognition()
   if (recognition) recognition.start()
 }
-// 分步动画：先淡出内容，再收缩宽度
+// 分步动画：先淡出内容，再收缩宽度，由SidebarHistory内部实现
 const showSidebar = ref(false) // 控制内容淡入淡出，默认关闭
 const collapsedSidebar = ref(true) // 控制宽度收缩，默认收缩
-const sidebarAbsRef = ref(null)
-
+// toggleSidebar 逻辑保留，用于按钮
 function toggleSidebar() {
   if (showSidebar.value) {
-    // 先淡出内容
     showSidebar.value = false
-    // 等待动画结束后再收缩宽度
   } else {
-    // 先展开宽度
     collapsedSidebar.value = false
-    // 下一帧再淡入内容
     nextTick(() => {
       showSidebar.value = true
     })
-  }
-}
-
-function onSidebarAbsTransitionEnd(e) {
-  if (e.propertyName === 'opacity' && !showSidebar.value) {
-    // 内容淡出动画结束，收缩宽度
-    collapsedSidebar.value = true
   }
 }
 
@@ -306,43 +290,6 @@ function toggleFunctionPanel() {
 }
 .list-toggle-btn {
   margin-right: 8px;
-}
-.sidebar-outer {
-  width: 260px;
-  min-width: 0;
-  max-width: 260px;
-  transition: width 0.3s cubic-bezier(.55,0,.1,1), margin-right 0.3s cubic-bezier(.55,0,.1,1);
-  overflow: visible;
-  will-change: width, margin-right;
-  position: relative;
-  flex-shrink: 0;
-  margin-right: 15px;
-  opacity: 1;
-}
-.sidebar-outer.collapsed {
-  width: 0;
-  min-width: 0;
-  max-width: 0;
-  padding: 0;
-  margin-right: 0;
-  /* 不再控制 opacity，pointer-events 依然关闭 */
-  pointer-events: none;
-}
-.sidebar-abs {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 260px;
-  height: 100%;
-  transition: opacity 0.3s cubic-bezier(.55,0,.1,1);
-  display: flex;
-  flex-direction: column;
-  opacity: 1;
-  pointer-events: auto;
-}
-.sidebar-abs.collapsed {
-  opacity: 0;
-  pointer-events: none;
 }
 .main-content {
   flex: 1;
