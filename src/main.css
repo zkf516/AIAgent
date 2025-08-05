@@ -520,6 +520,7 @@ textarea::placeholder {
 }
 
 /* 功能面板 */
+/* ChatPage点击功能显示面板的对应样式 */
 .function-panel {
     position: absolute;
     right: 30px;
