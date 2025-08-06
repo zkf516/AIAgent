@@ -78,6 +78,7 @@ function onSidebarAbsTransitionEnd(e) {
     isSidebarCollapsed.value = true
   }
 }
+
 </script>
 
 
@@ -176,6 +177,7 @@ function onSidebarAbsTransitionEnd(e) {
 .history-list {
     overflow-y: auto;
     flex: 1;
+    max-height: 55vh;
 }
 
 .history-item {
@@ -246,10 +248,10 @@ function onSidebarAbsTransitionEnd(e) {
   width: 260px;
   min-width: 0;
   max-width: 260px;
+  position: relative;
   transition: width 0.3s cubic-bezier(.55,0,.1,1), margin-right 0.3s cubic-bezier(.55,0,.1,1);
   overflow: visible;
   will-change: width, margin-right;
-  position: relative;
   flex-shrink: 0;
   margin-right: 15px;
   opacity: 1;
@@ -281,4 +283,42 @@ function onSidebarAbsTransitionEnd(e) {
   opacity: 0;
   pointer-events: none;
 }
+
+
+/* 手机端侧边栏覆盖全屏 + 遮罩 */
+@media (max-width: 768px) {
+  .sidebar {
+      padding: 40px 15px;
+  }
+
+  .sidebar-outer {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.2);
+    transition: transform 0.3s cubic-bezier(.55,0,.1,1);
+    background: var(--card-bg);
+    /* 默认隐藏在左侧 */
+    transform: translateX(-100%);
+  }
+
+  .sidebar-outer.collapsed {
+    /* 隐藏时左移 */
+    transform: translateX(-100%);
+  }
+
+  .sidebar-outer:not(.collapsed) {
+    /* 展开时滑入 */
+    transform: translateX(0);
+  }
+
+
+  .history-list {
+    max-height: 45vh;
+  }
+}
+
 </style>

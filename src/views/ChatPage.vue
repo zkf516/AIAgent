@@ -14,6 +14,7 @@
       @select-conversation="selectConversation"
       @go-user-info="goUserInfo"
     />
+    <div v-if="isMobile && showSidebar" class="sidebar-mask" @click="toggleSidebar"></div>
     <!-- 主聊天区 -->
     <div class="main-content">
       <div class="top-bar">
@@ -199,6 +200,7 @@ function startVoiceInput() {
 }
 // showSidebar控制侧边栏显示
 const showSidebar = ref(false)
+const isMobile = computed(() => window.innerWidth <= 768)
 function toggleSidebar() {
   showSidebar.value = !showSidebar.value
 }
@@ -308,4 +310,27 @@ function toggleFunctionPanel() {
   z-index: 10;
 }
 /* 输入栏已用 fixed，无需额外处理 */
+
+/* 手机端侧边栏覆盖全屏 + 遮罩 */
+@media (max-width: 768px) {
+  /* 遮罩层 */
+  .sidebar-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.25);
+    z-index: 99;
+    transition: opacity 0.3s;
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  .sidebar-mask.hide {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
 </style>
