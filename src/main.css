@@ -28,8 +28,7 @@
 body {
     background: var(--light-bg);
     color: var(--text);
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     position: relative;
 }
 
@@ -71,145 +70,12 @@ body {
 /* 主容器 */
 .container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
     max-width: 1600px;
     margin: 0 auto;
     padding: 15px;
 }
 
-/* 左侧功能区 */
-.sidebar {
-    width: 260px;
-    background: var(--card-bg);
-    border-radius: 18px;
-    box-shadow: 0 5px 20px var(--shadow);
-    padding: 20px 15px;
-    display: flex;
-    flex-direction: column;
-    z-index: 10;
-    margin-right: 15px;
-    border: 1px solid var(--border);
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 10px 20px;
-    border-bottom: 1px solid var(--border);
-}
-
-.logo-icon {
-    width: 38px;
-    height: 38px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-}
-
-.logo-text {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text);
-}
-
-/* SkyAI 新UI 全量CSS粘贴 */
-.logo-text span {
-    color: var(--primary);
-}
-
-.new-chat-btn {
-    background: linear-gradient(90deg, var(--primary), #5a7dff);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 12px 15px;
-    margin: 25px 0;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.new-chat-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px var(--shadow);
-}
-
-.history-title {
-    font-size: 14px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin: 15px 0 10px 10px;
-}
-
-.history-list {
-    overflow-y: auto;
-    flex: 1;
-}
-
-.history-item {
-    padding: 12px 15px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: all 0.3s;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.history-item:hover {
-    background: var(--primary-light);
-}
-
-.history-item.active {
-    background: var(--primary-light);
-    color: var(--primary);
-    font-weight: 500;
-}
-
-.history-item i {
-    margin-right: 10px;
-    opacity: 0.7;
-}
-
-.bottom-menu {
-    margin-top: auto;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-}
-
-.menu-item {
-    padding: 12px 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    transition: all 0.3s;
-    font-size: 14px;
-    color: var(--text);
-}
-
-.menu-item:hover {
-    background: var(--primary-light);
-}
-
-.menu-item i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-    color: var(--text-secondary);
-}
 
 /* 主聊天区 */
 .main-content {
@@ -278,6 +144,11 @@ body {
 }
 
 .chat-container {
+    position: absolute;
+    top: 60px;  /* top-bar高度，可根据实际调整 */
+    bottom: 130px;   /* 输入栏高度，可根据实际调整 */
+    left: 0;
+    right: 0;
     flex: 1;
     overflow-y: auto;
     padding: 30px;
@@ -286,6 +157,7 @@ body {
     gap: 25px;
     background: linear-gradient(to bottom, var(--light-bg) 0%, white 100%);
 }
+
 
 .message {
     display: flex;
@@ -308,6 +180,7 @@ body {
 
 .user-message {
     align-self: flex-end;
+    justify-content: flex-end;
 }
 
 .avatar {
@@ -440,6 +313,11 @@ body {
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: center;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    z-index: 100;
 }
 
 .input-box {
@@ -608,7 +486,7 @@ textarea::placeholder {
 /* 响应式设计 */
 @media (max-width: 768px) {
     .container {
-        padding: 10px;
+        padding: 0px;
         flex-direction: column;
     }
 
@@ -627,5 +505,41 @@ textarea::placeholder {
         width: 280px;
         right: 20px;
         bottom: 90px;
+    }
+
+    .top-bar {
+        padding: 40px 10px 20px;
+        max-height: 90px;
+    }
+
+    .tools {
+        gap: 5px;
+    }
+
+    .chat-container {
+        padding: 10px;
+        top: 90px;
+        bottom: 140px;
+
+    }
+
+    .message {
+        gap: 10px;
+        max-width: 90%;
+    }
+
+    .avatar {
+        width: 38x;
+        height: 38px;
+    }
+
+    .message-content {
+        padding: 20px;
+        font-size: 14px;
+    }
+
+    .input-container {
+        padding: 0 0 40px;
+        max-height: 140px;
     }
 }

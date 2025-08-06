@@ -17,13 +17,13 @@
     <!-- 主聊天区 -->
     <div class="main-content">
       <div class="top-bar">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 5px;">
           <button class="tool-btn list-toggle-btn" @click="toggleSidebar" title="历史对话">
             <i class="fas fa-bars"></i>
           </button>
           <div class="model-selector">
             <i class="fas fa-robot"></i>
-            <span>智灵联动 Pro 智能模型</span>
+            <span>智灵联动</span>
             <i class="fas fa-chevron-down" style="margin-left: auto;"></i>
           </div>
         </div>
@@ -284,5 +284,28 @@ function toggleFunctionPanel() {
   display: flex;
   flex-direction: column;
   transition: none;
+  height: 96vh;
+  box-sizing: border-box;
+  position: relative;
 }
+/* 让顶部栏绝对定位在 main-content 顶部 */
+.top-bar {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+/* 让聊天区可滚动且不撑大页面，顶部预留 top-bar 高度，底部预留输入栏高度 */
+
+/* 输入栏绝对定位在 main-content 底部 */
+.input-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+}
+/* 输入栏已用 fixed，无需额外处理 */
 </style>
