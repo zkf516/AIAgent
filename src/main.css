@@ -146,8 +146,10 @@ body {
 
 .chat-container {
     position: absolute;
-    top: 60px;  /* top-bar高度，可根据实际调整 */
-    bottom: 130px;   /* 输入栏高度，可根据实际调整 */
+    top: 60px;
+    /* top-bar高度，可根据实际调整 */
+    bottom: 130px;
+    /* 输入栏高度，可根据实际调整 */
     left: 0;
     right: 0;
     flex: 1;
@@ -215,7 +217,6 @@ body {
     box-shadow: 0 5px 15px var(--shadow);
     position: relative;
     overflow: hidden;
-    max-width: 85%;
 }
 
 .user-message .message-content {
@@ -231,17 +232,11 @@ body {
 }
 
 .message-actions {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     display: flex;
     gap: 8px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.message:hover .message-actions {
+    margin-top: 6px;
     opacity: 1;
+    justify-content: flex-end;
 }
 
 .action-btn {

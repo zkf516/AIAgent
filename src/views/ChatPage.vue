@@ -43,22 +43,27 @@
             <div class="avatar ai-avatar">
               <i class="bi bi-robot"></i>
             </div>
-            <div class="message-content">
+            <div>
+              <div class="message-content">
+                <MarkdownRenderer :content="msg.text" />
+              </div>
               <div class="message-actions">
                 <button class="action-btn"><i class="fas fa-copy"></i></button>
                 <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
                 <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
               </div>
-              <MarkdownRenderer :content="msg.text" />
             </div>
           </template>
           <template v-else>
-            <div class="message-content">
+            <div>
+              <div class="message-content">
+                <MarkdownRenderer :content="msg.text" />
+              </div>
               <div class="message-actions">
                 <button class="action-btn"><i class="fas fa-copy"></i></button>
-                <button class="action-btn"><i class="fas fa-edit"></i></button>
+                <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
+                <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
               </div>
-              <MarkdownRenderer :content="msg.text" />
             </div>
             <div class="avatar user-avatar">
               <i class="fa-solid fa-user-tie"></i>
