@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LobeChat - AI智能助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e6e6e6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            padding: 15px 20px;
+            background: rgba(15, 18, 30, 0.7);
+            border-radius: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            filter: drop-shadow(0 0 5px rgba(100, 150, 255, 0.5));
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(100, 150, 255, 0.5);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #8f94fb;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(25, 28, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .messages-container {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .message {
+            max-width: 100%;
+            padding: 25px 30px;
+            border-radius: 22px;
+            position: relative;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message {
+            background: rgba(30, 33, 50, 0.9);
+            border: 1px solid rgba(143, 148, 251, 0.2);
+            border-radius: 22px 22px 22px 6px;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4e54c8, #8f94fb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .sender-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #8f94fb;
+        }
+
+        .welcome-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 25px;
+        }
+
+        .welcome-title img {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+        }
+
+        .welcome-title h1 {
+            font-size: 42px;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(143, 148, 251, 0.6);
+        }
+
+        .message-content {
+            line-height: 1.7;
+            font-size: 17px;
+            color: #c5c5d3;
+        }
+
+        .message-content p {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .custom-btn-container {
+            display: flex;
+            justify-content: center;
+            margin: 25px 0 15px;
+        }
+
+        .custom-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #4e54c8, #8f94fb);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(78, 84, 200, 0.4);
+        }
+
+        .custom-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(78, 84, 200, 0.6);
+        }
+
+        .custom-btn .plus {
+            font-size: 24px;
+            margin-right: 8px;
+            line-height: 1;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0 15px;
+            margin-top: 25px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .section-title h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #8f94fb;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title h3:before {
+            content: "";
+            display: inline-block;
+            width: 5px;
+            height: 22px;
+            background: linear-gradient(180deg, #4e54c8, #8f94fb);
+            border-radius: 3px;
+            margin-right: 12px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(15deg);
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: #8f94fb;
+        }
+
+        .assistants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            padding: 15px 0 25px;
+        }
+
+        .assistant-card {
+            background: rgba(40, 44, 65, 0.7);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .assistant-card:hover {
+            transform: translateY(-7px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            border-color: rgba(143, 148, 251, 0.4);
+        }
+
+        .assistant-card a {
+            display: flex;
+            padding: 18px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .assistant-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .assistant-avatar img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+        }
+
+        .assistant-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .assistant-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .assistant-desc {
+            font-size: 14px;
+            color: #a0a0b5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            padding: 15px 0 25px;
+        }
+
+        .question-chip {
+            background: rgba(40, 44, 65, 0.7);
+            border-radius: 50px;
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 15px;
+            color: #c5c5d3;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .question-chip:hover {
+            background: rgba(78, 84, 200, 0.2);
+            color: #ffffff;
+            transform: translateY(-4px);
+            border-color: rgba(143, 148, 251, 0.3);
+        }
+
+        .footer {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            background: rgba(15, 18, 30, 0.7);
+            border-radius: 0 0 16px 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: #8a8aa3;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .footer a {
+            color: #8f94fb;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+
+            .header,
+            .chat-container,
+            .footer {
+                border-radius: 12px;
+            }
+
+            .messages-container {
+                padding: 20px;
+            }
+
+            .welcome-title h1 {
+                font-size: 32px;
+            }
+
+            .welcome-title img {
+                width: 50px;
+                height: 50px;
+            }
+
+            .assistants-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .message {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-anim-1/latest/files/assets/1f44b.webp"
+                alt="👋">
+            <h1>LobeChat</h1>
+        </div>
+        <div class="controls">
+            <div class="control-btn"><i class="fas fa-cog"></i></div>
+            <div class="control-btn"><i class="fas fa-expand"></i></div>
+            <div class="control-btn"><i class="fas fa-times"></i></div>
+        </div>
+    </div>
+    <div class="message ai-message">
+        <div class="message-content">
+            <!-- 居中的欢迎标题，图片在文字前 -->
+            <div class="welcome-title">
+                <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-anim-1/latest/files/assets/1f44b.webp"
+                    alt="👋">
+                <h1>晚上好</h1>
+            </div>
+
+            <p>我是您的私人智能助理 LobeChat，请问现在能帮您做什么？</p>
+
+            <!-- 创建助手按钮在气泡外部 -->
+            <div class="custom-btn-container">
+                <button class="custom-btn">
+                    <span class="plus">+</span> 创建自定义助手
+                </button>
+            </div>
+
+            <div class="section-title">
+                <h3>新增助手推荐：</h3>
+            </div>
+
+            <div class="assistants-grid">
+                <div class="assistant-card">
+                    <a href="#">
+                        <div class="assistant-avatar">
+                            <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f422.webp"
+                                alt="🐢">
+                        </div>
+                        <div class="assistant-info">
+                            <div class="assistant-name">海龟汤主持人</div>
+                            <div class="assistant-desc">需要自己提供汤面，汤底与关键点（猜中的判定条件）</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="assistant-card">
+                    <a href="#">
+                        <div class="assistant-avatar">
+                            <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f60b.webp"
+                                alt="😋">
+                        </div>
+                        <div class="assistant-info">
+                            <div class="assistant-name">美食评论员🍟</div>
+                            <div class="assistant-desc">美食评价专家</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="assistant-card">
+                    <a href="#">
+                        <div class="assistant-avatar">
+                            <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f4d8.webp"
+                                alt="📘">
+                        </div>
+                        <div class="assistant-info">
+                            <div class="assistant-name">学术写作助手</div>
+                            <div class="assistant-desc">专业的学术研究论文写作和正式文档编写专家</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="assistant-card">
+                    <a href="#">
+                        <div class="assistant-avatar">
+                            <img src="https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/2666-fe0f.webp"
+                                alt="♦️">
+                        </div>
+                        <div class="assistant-info">
+                            <div class="assistant-name">Minecraft资深开发者</div>
+                            <div class="assistant-desc">擅长高级 Java 开发及 Minecraft 开发</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h3>大家都在问：</h3>
+            </div>
+
+            <div class="questions-grid">
+                <div class="question-chip">是否支持插件系统？</div>
+                <div class="question-chip">LobeChat 如何部署和使用？</div>
+                <div class="question-chip">是否有云端服务版？</div>
+                <div class="question-chip">我在使用时遇到问题应该怎么办？</div>
+                <div class="question-chip">LobeChat 的定价是如何的？</div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 添加卡片悬停效果
+            const cards = document.querySelectorAll('.assistant-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-10px)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // 问题芯片点击效果
+            const questions = document.querySelectorAll('.question-chip');
+            questions.forEach(question => {
+                question.addEventListener('click', function () {
+                    this.style.backgroundColor = 'rgba(78, 84, 200, 0.3)';
+                    this.style.color = '#ffffff';
+
+                    setTimeout(() => {
+                        this.style.backgroundColor = '';
+                        this.style.color = '';
+                    }, 500);
+
+                    alert(`您选择了问题: "${this.textContent}"`);
+                });
+            });
+
+            // 创建助手按钮效果
+            const createBtn = document.querySelector('.custom-btn');
+            createBtn.addEventListener('click', function () {
+                this.style.transform = 'scale(1.1)';
+                this.style.boxShadow = '0 10px 30px rgba(78, 84, 200, 0.7)';
+
+                setTimeout(() => {
+                    this.style.transform = '';
+                    this.style.boxShadow = '0 6px 20px rgba(78, 84, 200, 0.4)';
+                }, 300);
+
+                alert('打开创建自定义助手面板');
+            });
+
+            // 刷新按钮效果
+            const refreshBtn = document.querySelector('.icon-btn');
+            refreshBtn.addEventListener('click', function () {
+                this.style.transform = 'rotate(360deg)';
+
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 500);
+
+                alert('刷新助手推荐列表');
+            });
+        });
+    </script>
+</body>
+
+</html>

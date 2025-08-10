@@ -39,6 +39,7 @@
         </div>
       </div>
       <div class="chat-container" ref="chatListRef" :key="chatContainerKey">
+        <AIWelcomeMessage />
         <div v-for="msg in activeMessages" :key="msg.id" :class="['message', msg.role==='user' ? 'user-message' : 'ai-message']">
           <template v-if="msg.role==='ai'">
             <div class="avatar ai-avatar">
@@ -123,6 +124,7 @@ import ChatInputBox from '../components/ChatInputBox.vue'
 import { useModelStore } from '../stores/modelStore'
 const modelStore = useModelStore()
 import ModelSelector from '../components/ModelSelector.vue'
+import AIWelcomeMessage from '@/components/AIWelcomeMessage.vue'
 
 // markdown渲染组件
 const md = new MarkdownIt({
