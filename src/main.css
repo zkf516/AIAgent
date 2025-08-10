@@ -157,7 +157,7 @@ body {
     padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 10px;
     background: linear-gradient(to bottom, var(--light-bg) 0%, white 100%);
 }
 
