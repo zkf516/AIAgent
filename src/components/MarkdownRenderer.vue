@@ -1,12 +1,13 @@
 <script setup>
-import { defineComponent, h } from 'vue'
 import MarkdownIt from 'markdown-it'
+import markdownItKatex from 'markdown-it-katex'
+import 'katex/dist/katex.min.css'
 
 const md = new MarkdownIt({
   html: false,
   linkify: true,
   breaks: true
-})
+}).use(markdownItKatex)
 
 defineProps({
   content: String
@@ -17,9 +18,12 @@ defineProps({
   <div class="markdown-body" v-html="md.render(content || '')"></div>
 </template>
 
-<style scoped>
+<style src="github-markdown-css/github-markdown-light.css"></style>
+<style>
 .markdown-body {
   word-break: break-word;
-  padding-left: 0.5em;
+  background: transparent !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 </style>

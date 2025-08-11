@@ -48,6 +48,14 @@
             <div>
               <div class="message-content">
                 <MarkdownRenderer :content="msg.text" />
+                <div v-if="msg.text === '' && showTyping" class="typing-indicator-in-msg" style="display: flex; align-items: center; gap: 4px;">
+                  <span>AI正在思考</span>
+                  <div class="typing-dots" style="display: inline-flex; margin-left: 2px;">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                  </div>
+                </div>
               </div>
               <div class="message-actions">
                 <button class="action-btn"><i class="fas fa-copy"></i></button>
@@ -72,14 +80,7 @@
             </div>
           </template>
         </div>
-        <div v-if="showTyping" class="typing-indicator">
-          <span>AI正在思考...</span>
-          <div class="typing-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-        </div>
+
       </div>
       <!-- 输入区域 -->
       <div class="input-container">
@@ -115,7 +116,7 @@
 
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import SidebarHistory from '../components/SidebarHistory.vue'
 import ChatInputBox from '../components/ChatInputBox.vue'
@@ -124,6 +125,7 @@ const modelStore = useModelStore()
 import ModelSelector from '../components/ModelSelector.vue'
 import AIWelcomeMessage from '@/components/AIWelcomeMessage.vue'
 import { connectWebSocket, closeWebSocket, addWebSocketListener, removeWebSocketListener } from '@/services/websocket.js'
+import { sendMessageRequest, parseDeepseekStream } from '@/services/deepseekService.js'
 
 // markdown渲染组件已抽离为独立文件
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
@@ -163,9 +165,9 @@ const conversations = ref([
 const activeConvId = ref(1)
 const input = ref('')
 const chatListRef = ref(null)
-// const inputRef = ref(null) // 已由ChatInputBox内部管理
 const showFunctionPanel = ref(false)
 const showTyping = ref(false)
+
 // 语音识别相关
 const recognizing = ref(false)
 let recognition = null
@@ -242,21 +244,42 @@ function scrollToBottom() {
   })
 }
 
-function send() {
+// 发送消息，并更新回复内容及UI
+async function send() {
   if (!input.value.trim()) return
   const conv = conversations.value.find(c => c.id === activeConvId.value)
   if (!conv) return
-  conv.messages.push({ id: Date.now(), role: 'user', text: input.value })
+  const userText = input.value
+  const userMsgId = Date.now()
+  conv.messages.push({ id: userMsgId, role: 'user', text: userText })
   scrollToBottom()
   showTyping.value = true
-  const userInput = input.value
   input.value = ''
-  // 清空输入后重置高度由ChatInputBox内部处理
-  setTimeout(() => {
-    conv.messages.push({ id: Date.now() + 1, role: 'ai', text: '感谢您的提问！这是一个模拟的AI回复。在实际应用中，这里会显示AI生成的回答。' })
-    showTyping.value = false
-    scrollToBottom()
-  }, 1000)
+  // 构造上下文
+  const messages = conv.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }))
+  const aiMsgId = userMsgId + 1
+  let aiMsg = reactive({ id: aiMsgId, role: 'ai', text: '' })
+  conv.messages.push(aiMsg)
+  scrollToBottom()
+  try {
+    // 1. 发送请求，获取 Response
+    const response = await sendMessageRequest(messages)
+    // 2. 解析流式响应，流式拼接 content 并实时渲染
+    let content = ''
+    for await (const { reasoning_content, content: deltaContent } of parseDeepseekStream(response.body)) {
+      if (deltaContent) {
+        content += deltaContent
+        aiMsg.text = content // MarkdownRenderer 会自动渲染
+        console.log("Content:", content)
+      }
+      // 如需流式显示思维链，可在此处理 reasoning_content
+      scrollToBottom()
+    }
+  } catch (e) {
+    aiMsg.text = 'AI回复失败，请稍后重试。'
+  }
+  showTyping.value = false
+  scrollToBottom()
 }
 
 function addConversation() {
