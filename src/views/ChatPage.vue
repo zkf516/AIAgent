@@ -117,28 +117,16 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import MarkdownIt from 'markdown-it'
-import { defineComponent, h } from 'vue'
 import SidebarHistory from '../components/SidebarHistory.vue'
 import ChatInputBox from '../components/ChatInputBox.vue'
 import { useModelStore } from '../stores/modelStore'
 const modelStore = useModelStore()
 import ModelSelector from '../components/ModelSelector.vue'
 import AIWelcomeMessage from '@/components/AIWelcomeMessage.vue'
+import { connectWebSocket, closeWebSocket, addWebSocketListener, removeWebSocketListener } from '@/services/websocket.js'
 
-// markdown渲染组件
-const md = new MarkdownIt({
-  html: false,
-  linkify: true,
-  breaks: true
-})
-const MarkdownRenderer = defineComponent({
-  name: 'MarkdownRenderer',
-  props: { content: String },
-  setup(props) {
-    return () => h('div', { class: 'markdown-body', innerHTML: md.render(props.content || '') })
-  }
-})
+// markdown渲染组件已抽离为独立文件
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
 const router = useRouter()
 const conversations = ref([
@@ -182,8 +170,6 @@ const showTyping = ref(false)
 const recognizing = ref(false)
 let recognition = null
 
-// WebSocket相关
-let ws = null
 
 function initSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -241,33 +227,10 @@ function addIncomingCall(number) {
   scrollToBottom()
 }
 
-// WebSocket
-function initWebSocket() {
-  ws = new WebSocket('ws://localhost:3000')
-
-  ws.onopen = () => {
-    console.log('✅ WebSocket 已连接')
-  }
-
-  ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data)
-      if (data.type === 'incomingCall') {
-        addIncomingCall(data.number)
-      }
-    } catch (err) {
-      console.error('WebSocket消息解析失败:', err)
-    }
-  }
-
-  ws.onclose = () => {
-    console.log('❌ WebSocket 已关闭，5秒后重连...')
-    setTimeout(initWebSocket, 5000)
-  }
-
-  ws.onerror = (err) => {
-    console.error('WebSocket 错误:', err)
-    ws.close()
+// WebSocket 事件监听
+function handleWsEvent(evt) {
+  if (evt.type === 'message' && evt.data && evt.data.type === 'incomingCall') {
+    addIncomingCall(evt.data.number)
   }
 }
 
@@ -335,11 +298,13 @@ function simulateIncomingCall() {
 
 
 onMounted(() => {
-  initWebSocket()
+  connectWebSocket()
+  addWebSocketListener(handleWsEvent)
 })
 
 onBeforeUnmount(() => {
-  if (ws) ws.close()
+  closeWebSocket()
+  removeWebSocketListener(handleWsEvent)
 })
 
 </script>
@@ -357,9 +322,7 @@ onBeforeUnmount(() => {
   position: absolute;
   border-radius: 50%;
 }
-.markdown-body {
-  word-break: break-word;
-}
+
 .main-content {
   flex: 1;
   display: flex;
@@ -377,7 +340,6 @@ onBeforeUnmount(() => {
   left: 0;
   z-index: 10;
 }
-/* 让聊天区可滚动且不撑大页面，顶部预留 top-bar 高度，底部预留输入栏高度 */
 
 /* 输入栏绝对定位在 main-content 底部 */
 .input-container {
@@ -388,7 +350,6 @@ onBeforeUnmount(() => {
   width: 100%;
   z-index: 10;
 }
-/* 输入栏已用 fixed，无需额外处理 */
 
 /* 手机端侧边栏覆盖全屏 + 遮罩 */
 @media (max-width: 768px) {
