@@ -360,9 +360,6 @@ onBeforeUnmount(() => {
 .markdown-body {
   word-break: break-word;
 }
-.list-toggle-btn {
-  margin-right: 8px;
-}
 .main-content {
   flex: 1;
   display: flex;

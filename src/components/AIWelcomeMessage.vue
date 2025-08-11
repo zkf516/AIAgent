@@ -164,10 +164,10 @@ function onQuestionClick(q) {
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   color: white;
   border: none;
-  padding: 12px 25px;
+  padding: 10px 15px;
   border-radius: 12px;
   font-weight: 500;
-  font-size: 17px;
+  font-size: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 6px 20px var(--shadow);
@@ -177,7 +177,7 @@ function onQuestionClick(q) {
   box-shadow: 0 8px 25px var(--shadow);
 }
 .custom-btn .plus {
-  font-size: 24px;
+  font-size: 20px;
   margin-right: 8px;
   line-height: 1;
 }
@@ -227,7 +227,7 @@ function onQuestionClick(q) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
-  padding: 15px 0 15px;
+  padding: 10px 0 10px;
 }
 .assistant-card {
   background: var(--card-bg);
