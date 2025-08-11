@@ -35,7 +35,23 @@
           <div class="tool-btn" @click="simulateIncomingCall"><i class="fa-solid fa-phone-volume"></i></div>
           <div class="tool-btn" @click="refreshChatContainer"><i class="fas fa-sync-alt"></i></div>
           <div class="tool-btn" @click="toggleFunctionPanel"><i class="fas fa-plug"></i></div>
-          <div class="tool-btn"><i class="fas fa-ellipsis-h"></i></div>
+          <div class="tool-btn dropdown-trigger" @click="toggleDropdown">
+            <i class="fas fa-ellipsis-h"></i>
+            <div v-if="showDropdown" class="dropdown-menu">
+              <button class="dropdown-item" @click.stop="simulateIncomingCall">
+                <i class="fa-solid fa-phone-volume"></i> 电话
+              </button>
+              <button class="dropdown-item">
+                <i class="fas fa-map-marker-alt"></i> 地图
+              </button>
+              <button class="dropdown-item">
+                <i class="fab fa-weibo"></i> 微博
+              </button>
+              <button class="dropdown-item">
+                <i class="fas fa-plus"></i> 新增
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div class="chat-container" ref="chatListRef" :key="chatContainerKey">
@@ -166,6 +182,21 @@ const activeConvId = ref(1)
 const input = ref('')
 const chatListRef = ref(null)
 const showFunctionPanel = ref(false)
+const showDropdown = ref(false)
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+
+// 点击页面其他区域关闭下拉
+function handleClickOutsideDropdown(e) {
+  const trigger = document.querySelector('.dropdown-trigger')
+  if (showDropdown.value && trigger && !trigger.contains(e.target)) {
+    showDropdown.value = false
+  }
+}
+
+
 const showTyping = ref(false)
 
 // 语音识别相关
@@ -323,17 +354,20 @@ function simulateIncomingCall() {
 onMounted(() => {
   connectWebSocket()
   addWebSocketListener(handleWsEvent)
+  document.addEventListener('click', handleClickOutsideDropdown)
 })
 
 onBeforeUnmount(() => {
   closeWebSocket()
   removeWebSocketListener(handleWsEvent)
+  document.removeEventListener('click', handleClickOutsideDropdown)
 })
 
 </script>
 
 
 <style scoped>
+
 .bg-effects {
   position: absolute;
   width: 100%;
@@ -394,5 +428,42 @@ onBeforeUnmount(() => {
     opacity: 0;
     pointer-events: none;
   }
+}
+
+/* 右上角省略号下拉菜单样式 */
+.dropdown-trigger {
+  position: relative;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #eee);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  min-width: 120px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+}
+.dropdown-item {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 18px;
+  font-size: 15px;
+  color: var(--text, #333);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.dropdown-item:hover {
+  background: var(--primary-light, #f0f4ff);
 }
 </style>

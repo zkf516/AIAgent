@@ -26,18 +26,19 @@
           </div>
         </div>
         <div class="bottom-menu">
+          <div class="menu-item" @click="$emit('go-user-info')">
+            <i class="fas fa-user"></i>
+            <span class="menu-text">账户</span>
+          </div>
           <div class="menu-item">
             <i class="fas fa-cog"></i>
             <span class="menu-text">设置</span>
           </div>
           <div class="menu-item">
-            <i class="fas fa-lightbulb"></i>
-            <span class="menu-text">功能</span>
+            <i class="fas fa-ellipsis-h"></i>
+            <span class="menu-text">更多</span>
           </div>
-          <div class="menu-item" @click="$emit('go-user-info')">
-            <i class="fas fa-user"></i>
-            <span class="menu-text">账户</span>
-          </div>
+          
         </div>
       </div>
     </div>

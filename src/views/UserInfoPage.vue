@@ -1,8 +1,8 @@
 <template>
   <div class="user-info-page">
-    <header>
-      <span>个人信息</span>
+    <header class="user-header">
       <button class="back-btn" @click="goBack">返回</button>
+      <span class="header-title">账户信息</span>
     </header>
     <div class="user-info-content">
       <div v-if="loading" class="loading">加载中...</div>
@@ -102,15 +102,27 @@ onMounted(fetchUserInfo)
   min-height: 100vh;
   background: var(--light-bg);
 }
-header {
+/* 新的 header 样式 */
+.user-header {
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 20px 30px 10px 30px;
+  padding: 40px 20px 15px 20px;
+    margin: 0px 5px;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border);
   border-radius: 0 0 18px 18px;
   box-shadow: 0 2px 8px var(--shadow);
+}
+
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: 2px;
+  margin-right: 40px;
 }
 .back-btn {
   background: linear-gradient(90deg, var(--primary), #5a7dff);
@@ -118,7 +130,7 @@ header {
   border: none;
   border-radius: 10px;
   padding: 8px 18px;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
@@ -128,7 +140,7 @@ header {
 }
 .user-info-content {
   max-width: 480px;
-  margin: 30px auto 0 auto;
+  margin: 10px auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -185,7 +197,7 @@ header {
 }
 .vip-icon {
   color: #ffd700;
-  font-size: 26px;
+  font-size: 24px;
   filter: drop-shadow(0 2px 6px #ffe066);
 }
 .vip-title {
