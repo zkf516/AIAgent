@@ -181,28 +181,16 @@ const conversations = ref([
 const activeConvId = ref(1)
 const input = ref('')
 const chatListRef = ref(null)
+const showTyping = ref(false)
+
+// topbar相关状态
 const showFunctionPanel = ref(false)
 const showDropdown = ref(false)
 
-function toggleDropdown() {
-  showDropdown.value = !showDropdown.value
-}
-
-// 点击页面其他区域关闭下拉
-function handleClickOutsideDropdown(e) {
-  const trigger = document.querySelector('.dropdown-trigger')
-  if (showDropdown.value && trigger && !trigger.contains(e.target)) {
-    showDropdown.value = false
-  }
-}
-
-
-const showTyping = ref(false)
 
 // 语音识别相关
 const recognizing = ref(false)
 let recognition = null
-
 
 function initSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -235,6 +223,7 @@ function startVoiceInput() {
   if (!recognition) recognition = initSpeechRecognition()
   if (recognition) recognition.start()
 }
+
 // showSidebar控制侧边栏显示
 const showSidebar = ref(false)
 const isMobile = computed(() => window.innerWidth <= 768)
@@ -283,7 +272,7 @@ async function send() {
   const userText = input.value
   const userMsgId = Date.now()
   conv.messages.push({ id: userMsgId, role: 'user', text: userText })
-  scrollToBottom()
+  //scrollToBottom()
   showTyping.value = true
   input.value = ''
   // 构造上下文
@@ -291,7 +280,7 @@ async function send() {
   const aiMsgId = userMsgId + 1
   let aiMsg = reactive({ id: aiMsgId, role: 'ai', text: '' })
   conv.messages.push(aiMsg)
-  scrollToBottom()
+  //scrollToBottom()
   try {
     // 1. 发送请求，获取 Response
     const response = await sendMessageRequest(messages)
@@ -304,7 +293,7 @@ async function send() {
         console.log("Content:", content)
       }
       // 如需流式显示思维链，可在此处理 reasoning_content
-      scrollToBottom()
+      //scrollToBottom()
     }
   } catch (e) {
     aiMsg.text = 'AI回复失败，请稍后重试。'
@@ -313,6 +302,8 @@ async function send() {
   scrollToBottom()
 }
 
+
+// 对话相关函数
 function addConversation() {
   const newId = Date.now()
   conversations.value.push({
@@ -331,10 +322,12 @@ function selectConversation(id) {
   scrollToBottom()
 }
 
+// 页面跳转
 function goUserInfo() {
   router.push('/user')
 }
 
+// topbar按钮功能
 const chatContainerKey = ref(Date.now())
 function refreshChatContainer() {
   chatContainerKey.value = Date.now() // 每次点击都变，强制重新渲染
@@ -343,6 +336,19 @@ function refreshChatContainer() {
 function toggleFunctionPanel() {
   showFunctionPanel.value = !showFunctionPanel.value
 }
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+
+// 点击页面其他区域关闭下拉
+function handleClickOutsideDropdown(e) {
+  const trigger = document.querySelector('.dropdown-trigger')
+  if (showDropdown.value && trigger && !trigger.contains(e.target)) {
+    showDropdown.value = false
+  }
+}
+
 
 // === 新增: 模拟来电按钮 ===
 function simulateIncomingCall() {
