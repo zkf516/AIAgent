@@ -1,0 +1,68 @@
+{
+    "DeepSeek": {
+        "request": {
+            "url": "https://api.deepseek.com/v1/chat/completions",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer ${apiKey}"
+            },
+            "body": {
+                "model": "deepseek-reasoner",
+                "messages": "${messages}",
+                "stream": true
+            }
+        },
+        "response": {
+            "type": "sse-stream",
+            "linePrefix": "data:",
+            "endFlag": "[DONE]",
+            "jsonPath": "choices[0].delta",
+            "fields": {
+                "reasoning_content": "reasoning_content",
+                "content": "content"
+            }
+        }
+    },
+    "zhiling_chat": {
+        "request": {
+            "url": "http://10.22.61.21:12000/chat",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": {
+                "messages": "${messages}"
+            }
+        },
+        "response": {
+            "type": "json",
+            "jsonPath": "messages[0].content[0]",
+            "fields": {
+                "text": "text",
+                "audio": "audio",
+                "image": "image"
+            }
+        }
+    },
+    "zhiling_phonecall": {
+        "request": {
+            "url": "/phonecall",
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": {
+                "messages": "${messages}"
+            }
+        },
+        "response": {
+            "type": "json",
+            "jsonPath": "messages[0].content[0]",
+            "fields": {
+                "text": "text",
+                "audio": "audio"
+            }
+        }
+    }
+}

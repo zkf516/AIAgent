@@ -140,7 +140,7 @@ const modelStore = useModelStore()
 import ModelSelector from '../components/ModelSelector.vue'
 import AIWelcomeMessage from '@/components/AIWelcomeMessage.vue'
 import { connectWebSocket, closeWebSocket, addWebSocketListener, removeWebSocketListener } from '@/services/websocket.js'
-import { sendMessageRequest, parseDeepseekStream } from '@/services/deepseekService.js'
+//import { sendMessageRequest, parseDeepseekStream } from '@/services/deepseekService.js'
 
 // 导入markdown渲染组件
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
@@ -264,42 +264,63 @@ function scrollToBottom() {
   })
 }
 
-// 发送消息，并更新回复内容及UI
+// 通用发送消息，只处理用户输入和UI
+import { sendMessageByModel, parseResponseBySchema } from '@/services/backend.js'
+import modelSchemas from '@/services/model_schemas.json'
+
 async function send() {
-  if (!input.value.trim()) return
+  const text = input.value.trim()
+  if (!text) return
   const conv = conversations.value.find(c => c.id === activeConvId.value)
   if (!conv) return
-  const userText = input.value
   const userMsgId = Date.now()
-  conv.messages.push({ id: userMsgId, role: 'user', text: userText })
-  //scrollToBottom()
+  conv.messages.push({ id: userMsgId, role: 'user', text })
+  scrollToBottom()
   showTyping.value = true
   input.value = ''
-  // 构造上下文
-  const messages = conv.messages.map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }))
-  const aiMsgId = userMsgId + 1
-  let aiMsg = reactive({ id: aiMsgId, role: 'ai', text: '' })
+  // 预添加AI消息
+  const aiMsg = reactive({ id: userMsgId + 1, role: 'ai', text: '' })
   conv.messages.push(aiMsg)
-  //scrollToBottom()
+  scrollToBottom()
+  // 单独处理AI回复
+  getAIReply(conv, aiMsg)
+}
+
+// 通用获取AI回复，处理流式渲染
+async function getAIReply(conv, aiMsg) {
+  // 构造通用上下文
+  const messages = conv.messages.map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.text
+  }))
+  // 获取当前模型名和 apikey（如有）
+  const model = /*modelStore.currentModel ||*/ 'zhiling_chat'
+  const apiKey = modelStore.apiKey || ''
   try {
-    // 1. 发送请求，获取 Response
-    const response = await sendMessageRequest(messages)
-    // 2. 解析流式响应，流式拼接 content 并实时渲染
-    let content = ''
-    for await (const { reasoning_content, content: deltaContent } of parseDeepseekStream(response.body)) {
-      if (deltaContent) {
-        content += deltaContent
-        aiMsg.text = content // MarkdownRenderer 会自动渲染
-        console.log("Content:", content)
+    const response = await sendMessageByModel(model, { apiKey, model, messages })
+    const schema = modelSchemas[model]?.response
+    if (!schema) throw new Error('模型响应结构未配置')
+    if (schema.type === 'sse-stream') {
+      let content = ''
+      for await (const chunk of parseResponseBySchema(schema, response)) {
+        if (chunk.content) {
+          content += chunk.content
+          aiMsg.text = content
+        }
+        scrollToBottom()
       }
-      // 如需流式显示思维链，可在此处理 reasoning_content
-      //scrollToBottom()
+    } else {
+      // 非流式，直接取一次
+      const result = await parseResponseBySchema(schema, response).next()
+      aiMsg.text = result.value?.content || ''
+      scrollToBottom()
     }
   } catch (e) {
     aiMsg.text = 'AI回复失败，请稍后重试。'
+  } finally {
+    showTyping.value = false
+    scrollToBottom()
   }
-  showTyping.value = false
-  scrollToBottom()
 }
 
 
