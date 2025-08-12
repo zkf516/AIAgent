@@ -127,8 +127,8 @@ function onAddModelSave() {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   flex-shrink: 0;
 }
 .model-logo-img {

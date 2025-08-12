@@ -92,11 +92,13 @@ export async function* parseResponseBySchema(schema, response) {
 export async function sendMessageByModel(model, params) {
     const schema = modelSchemas[model]
     const req = buildRequestBySchema(model, params)
+    console.log('Sending request:', req)
     const response = await fetch(req.url, {
         method: req.method,
         headers: req.headers,
         body: req.body
     })
+    console.log('Received response:', response)
     return response
 }
 

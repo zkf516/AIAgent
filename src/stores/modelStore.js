@@ -3,11 +3,12 @@ import { ref } from 'vue'
 
 export const useModelStore = defineStore('model', () => {
     const models = ref([
-        { name: 'DeepSeek', icon: '/deepseek.svg' },
+        { name: 'DeepSeek-R1', icon: '/deepseek.svg' },
         { name: 'gpt-4o-mini', icon: '/openai-logo.svg' },
-        { name: 'qwen-max', icon: '/openai-logo.svg' },
-        { name: 'qwen-vl-max', icon: 'bi bi-gem' },
-        { name: 'qwen2.5-7b-instruct', icon: 'bi bi-gem' }
+        { name: 'qwen-max', icon: '/qwen.svg' },
+        { name: 'qwen-vl-max', icon: '/qwen.svg' },
+        { name: 'qwen2.5-7b-instruct', icon: '/qwen.svg' },
+        { name: 'zhiling-chat', icon: '/zhiling-logo.svg' }
     ])
     const currentModel = ref(models.value[0].name)
     const showModelDropdown = ref(false)

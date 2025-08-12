@@ -1,5 +1,5 @@
 {
-    "DeepSeek": {
+    "DeepSeek-R1": {
         "request": {
             "url": "https://api.deepseek.com/v1/chat/completions",
             "method": "POST",
@@ -24,7 +24,7 @@
             }
         }
     },
-    "zhiling_chat": {
+    "zhiling-chat": {
         "request": {
             "url": "http://10.22.61.21:12000/chat",
             "method": "POST",

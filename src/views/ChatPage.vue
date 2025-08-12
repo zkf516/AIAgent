@@ -294,7 +294,7 @@ async function getAIReply(conv, aiMsg) {
     content: m.text
   }))
   // 获取当前模型名和 apikey（如有）
-  const model = /*modelStore.currentModel ||*/ 'DeepSeek'
+  const model = modelStore.currentModel || 'DeepSeek-R1'
   const apiKey = modelStore.apiKey || 'sk-8063db03ab5749099d809c8967f5c951'
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
@@ -468,7 +468,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--border, #eee);
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  min-width: 140px;
+  min-width: 150px;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -480,7 +480,7 @@ onBeforeUnmount(() => {
   outline: none;
   width: 100%;
   text-align: left;
-  padding: 8px 15px;
+  padding: 8px 20px;
   font-size: 15px;
   color: var(--primary, #3b6cff); /* 与.tool-btn一致 */
   display: flex;
