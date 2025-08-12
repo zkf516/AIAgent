@@ -32,23 +32,22 @@
           />
         </div>
         <div class="tools">
-          <div class="tool-btn" @click="simulateIncomingCall"><i class="fa-solid fa-phone-volume"></i></div>
           <div class="tool-btn" @click="refreshChatContainer"><i class="fas fa-sync-alt"></i></div>
           <div class="tool-btn" @click="toggleFunctionPanel"><i class="fas fa-plug"></i></div>
           <div class="tool-btn dropdown-trigger" @click="toggleDropdown">
             <i class="fas fa-ellipsis-h"></i>
             <div v-if="showDropdown" class="dropdown-menu">
               <button class="dropdown-item" @click.stop="simulateIncomingCall">
-                <i class="fa-solid fa-phone-volume"></i> 电话
+                <i class="fa-solid fa-phone-volume"></i> 电话接打
               </button>
               <button class="dropdown-item">
-                <i class="fas fa-map-marker-alt"></i> 地图
+                <i class="fab fa-weibo"></i> 微博热搜
               </button>
               <button class="dropdown-item">
-                <i class="fab fa-weibo"></i> 微博
+                <i class="fas fa-map"></i> 出行规划
               </button>
               <button class="dropdown-item">
-                <i class="fas fa-plus"></i> 新增
+                <i class="fab fa-twitter"></i> twitter发帖
               </button>
             </div>
           </div>
@@ -143,8 +142,9 @@ import AIWelcomeMessage from '@/components/AIWelcomeMessage.vue'
 import { connectWebSocket, closeWebSocket, addWebSocketListener, removeWebSocketListener } from '@/services/websocket.js'
 import { sendMessageRequest, parseDeepseekStream } from '@/services/deepseekService.js'
 
-// markdown渲染组件已抽离为独立文件
+// 导入markdown渲染组件
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
+
 
 const router = useRouter()
 const conversations = ref([
@@ -367,7 +367,6 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-
 .bg-effects {
   position: absolute;
   width: 100%;
@@ -436,13 +435,13 @@ onBeforeUnmount(() => {
 }
 .dropdown-menu {
   position: absolute;
-  top: 32px;
+  top: 50px;
   right: 0;
   background: var(--card-bg, #fff);
   border: 1px solid var(--border, #eee);
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  min-width: 120px;
+  min-width: 140px;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -454,15 +453,27 @@ onBeforeUnmount(() => {
   outline: none;
   width: 100%;
   text-align: left;
-  padding: 8px 18px;
+  padding: 8px 15px;
   font-size: 15px;
-  color: var(--text, #333);
+  color: var(--primary, #3b6cff); /* 与.tool-btn一致 */
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   transition: background 0.15s;
+  line-height: 1.2;
 }
+.dropdown-item i {
+  color: var(--primary, #3b6cff); /* 图标同样主色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  width: 22px; /* 统一宽度，可根据实际调整 */
+  min-width: 22px;
+  text-align: center;
+}
+
 .dropdown-item:hover {
   background: var(--primary-light, #f0f4ff);
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="ai-welcome-message">
       <div class="welcome-title">
-        <img class="welcome-img" src="https://registry.npmmirror.com/@lobehub/fluent-emoji-anim-1/latest/files/assets/1f44b.webp" alt="👋" />
+        <img class="welcome-img" src="/hello.webp" alt="👋" />
         <h1>{{ greeting }}</h1>
       </div>
       <div class="welcome-inner">
