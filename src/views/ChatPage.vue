@@ -288,14 +288,28 @@ async function send() {
 
 // 通用获取AI回复，处理流式渲染
 async function getAIReply(conv, aiMsg) {
-  // 构造通用上下文
-  const messages = conv.messages.map(m => ({
-    role: m.role === 'user' ? 'user' : 'assistant',
-    content: m.text
-  }))
   // 获取当前模型名和 apikey（如有）
   const model = modelStore.currentModel || 'DeepSeek-R1'
   const apiKey = modelStore.apiKey || 'sk-8063db03ab5749099d809c8967f5c951'
+  let messages
+  // 构造通用上下文
+  if ( model === 'DeepSeek-R1') {
+    messages = conv.messages.map(m => ({
+      role: m.role === 'user' ? 'user' : 'assistant',
+      content: m.text
+    }))
+  } else {
+    //只发送倒数第二条消息（最新用户输入）
+    const lastMsg = conv.messages[conv.messages.length - 2]
+    messages = [{
+      role: lastMsg.role === 'user' ? 'user' : 'assistant',
+      content: [
+        { username: '张三' },
+        { text: lastMsg.text }
+      ]
+    }]
+  }
+
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
     const schema = modelSchemas[model]?.response
@@ -312,7 +326,7 @@ async function getAIReply(conv, aiMsg) {
     } else {
       // 非流式，直接取一次
       const result = await parseResponseBySchema(schema, response).next()
-      aiMsg.text = result.value?.content || ''
+      aiMsg.text = result.value?.text || ''
       scrollToBottom()
     }
   } catch (e) {
