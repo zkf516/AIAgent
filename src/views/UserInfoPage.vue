@@ -1,17 +1,20 @@
+<!-- UserCard.vue -->
 <template>
   <div class="user-info-page">
     <header class="user-header">
       <button class="back-btn" @click="goBack">返回</button>
       <span class="header-title">账户信息</span>
     </header>
+
     <div class="user-info-content">
       <div v-if="loading" class="loading">加载中...</div>
-      <div v-else>
-        <!-- 基本信息卡片 -->
+
+      <template v-else>
+        <!-- 1. 基础信息（姓名 / 手机 / 证件） -->
         <div class="info-card">
           <div class="info-row">
             <i class="fas fa-user"></i>
-            <span class="label">昵称：</span>
+            <span class="label">姓名：</span>
             <span class="value">{{ user.name }}</span>
           </div>
           <div class="info-row">
@@ -20,21 +23,49 @@
             <span class="value">{{ user.phone }}</span>
           </div>
           <div class="info-row">
-            <i class="fas fa-gift"></i>
-            <span class="label">套餐：</span>
-            <span class="value">{{ user.plan }}</span>
+            <i class="fas fa-id-card"></i>
+            <span class="label">证件类型：</span>
+            <span class="value">{{ user.idType }}</span>
           </div>
           <div class="info-row">
-            <i class="fas fa-coins"></i>
-            <span class="label">积分：</span>
-            <span class="value">{{ user.points }}</span>
+            <i class="fas fa-fingerprint"></i>
+            <span class="label">证件号码：</span>
+            <span class="value">{{ user.idNumber }}</span>
           </div>
         </div>
-        <!-- VIP 等级卡片 -->
+
+        <!-- 2. 套餐信息（独立卡片 + 小图标） -->
+        <div class="plan-card">
+          <div class="card-title">
+            <i class="fas fa-wifi"></i> 套餐信息
+          </div>
+          <div class="plan-row">
+            <i class="fas fa-tv text-blue"></i>
+            <span class="lab">套餐类型：</span>
+            <span class="val">{{ user.planType }}</span>
+          </div>
+          <div class="plan-row">
+            <i class="fas fa-coins text-green"></i>
+            <span class="lab">月费用：</span>
+            <span class="val">{{ user.monthlyFee }} 元</span>
+          </div>
+          <div class="plan-row">
+            <i class="fas fa-calendar-alt text-orange"></i>
+            <span class="lab">合约期：</span>
+            <span class="val">{{ user.contractMonths }} 个月</span>
+          </div>
+          <div class="plan-row">
+            <i class="fas fa-phone text-red"></i>
+            <span class="lab">含电话套餐：</span>
+            <span class="val">{{ user.hasPhonePlan ? '是' : '否' }}</span>
+          </div>
+        </div>
+
+        <!-- 3. VIP 等级 -->
         <div class="vip-card">
           <div class="vip-header">
             <i class="fas fa-crown vip-icon"></i>
-            <span class="vip-title">VIP等级</span>
+            <span class="vip-title">VIP 等级</span>
             <span class="vip-level">{{ user.vipLevel }}</span>
           </div>
           <div class="vip-detail">
@@ -42,11 +73,18 @@
             <span class="vip-expire">{{ user.vipExpire }}</span>
           </div>
         </div>
-        <!-- 会员权益卡片 -->
+
+        <!-- 4. 会员专属权益 -->
         <div class="rights-card">
-          <div class="rights-title"><i class="fas fa-shield-alt"></i> 会员专属权益</div>
+          <div class="rights-title">
+            <i class="fas fa-shield-alt"></i> 会员专属权益
+          </div>
           <div class="rights-list">
-            <div class="right-item" v-for="r in user.rights" :key="r.title">
+            <div
+              class="right-item"
+              v-for="(r, idx) in user.rights"
+              :key="'right-' + idx"
+            >
               <i :class="r.icon"></i>
               <div class="right-info">
                 <div class="right-title">{{ r.title }}</div>
@@ -55,7 +93,51 @@
             </div>
           </div>
         </div>
-      </div>
+
+        <!-- 5. 黑名单 -->
+        <div class="rights-card">
+          <div class="rights-title">
+            <i class="fas fa-ban"></i> 电话黑名单
+          </div>
+          <div class="rights-list">
+            <div
+              v-for="(num, idx) in user.blacklist"
+              :key="idx"
+              class="right-item"
+            >
+              <i class="fas fa-phone-slash"></i>
+              <span>{{ num }}</span>
+            </div>
+            <div v-if="!user.blacklist.length" class="right-item">
+              <span class="right-desc">暂无黑名单号码</span>
+            </div>
+          </div>
+        </div>
+        <!-- 6. 个人财产（独立卡片） -->
+        <div class="asset-card">
+          <div class="rights-title">
+            <i class="fas fa-piggy-bank"></i> 个人财产
+          </div>
+          <div class="rights-list">
+            <div
+              class="right-item"
+              v-for="(a, idx) in user.assets"
+              :key="'asset-' + idx"
+            >
+              <i :class="a.icon"></i>
+              <div class="right-info">
+                <div class="right-title">
+                  {{ a.name }}
+                  <small class="highlight">×{{ a.amount }}</small>
+                </div>
+                <div class="right-desc">{{ a.desc }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        
+      </template>
     </div>
   </div>
 </template>
@@ -68,53 +150,78 @@ const router = useRouter()
 const loading = ref(true)
 const user = ref({})
 
-function goBack() {
-  router.push('/')
-}
+const goBack = () => router.back()
 
-function fetchUserInfo() {
-  loading.value = true
+onMounted(() => {
   setTimeout(() => {
     user.value = {
-      name: '张三',
-      phone: '138****8888',
-      plan: '5G畅享套餐',
-      points: 1200,
-      vipLevel: '黄金会员',
-      vipExpire: '2025-12-31',
+      name: '李雷',
+      phone: '176****1234',
+      idType: '居民身份证',
+      idNumber: '3101**********1234',
+      planType: '家庭版单宽200M',
+      monthlyFee: 47.0,
+      contractMonths: 36,
+      hasPhonePlan: false,
+      vipLevel: '青铜',
+      vipExpire: '2027-08-11',
       rights: [
-        { icon: 'fas fa-badge-check', title: '专属标识', desc: '昵称旁专属VIP标识' },
-        { icon: 'fas fa-rocket', title: '优先响应', desc: 'AI回复速度优先' },
-        { icon: 'fas fa-gem', title: '积分加速', desc: '积分获取速度提升50%' },
-        { icon: 'fas fa-gift', title: '专属活动', desc: '参与会员专属活动' },
-        { icon: 'fas fa-headset', title: '专属客服', desc: '专属人工客服通道' }
-      ]
+        {
+          icon: 'fas fa-tachometer-alt',
+          title: '200M 高速宽带',
+          desc: '下行 200Mbps / 上行 30Mbps'
+        },
+      ],
+      assets: [
+        { icon: 'fas fa-star', name: '积分', amount: 1680, desc: '可抵话费 / 兑换礼品' },
+        { icon: 'fas fa-ticket-alt', name: '话费券', amount: 3, desc: '满 50 减 5 元券' },
+        { icon: 'fas fa-sim-card', name: '流量包', amount: 2, desc: '5G 10GB 日包' },
+        { icon: 'fas fa-qrcode', name: '电子券', amount: 5, desc: '京东 20 元购物券' },
+        { icon: 'fas fa-exchange-alt', name: '兑换券', amount: 1, desc: '腾讯视频月卡' },
+        { icon: 'fas fa-phone', name: '语音包', amount: 300, desc: '全国语音 300 分钟' },
+        { icon: 'fas fa-gift', name: '实物', amount: 1, desc: '千兆路由器待领取' },
+        { icon: 'fas fa-credit-card', name: '卡券', amount: 2, desc: '美团外卖 15 元代金券' },
+        { icon: 'fas fa-gem', name: '王钻', amount: 88, desc: '可参与王钻抽奖' },
+        { icon: 'fas fa-award', name: '其他奖品', amount: 1, desc: '周年庆神秘盲盒' }
+      ],
+      blacklist: ['4001008888', '021-6183****']
     }
     loading.value = false
-  }, 1000)
-}
-
-onMounted(fetchUserInfo)
+  }, 600)
+})
 </script>
 
 <style scoped>
+/* ===== 通用变量 ===== */
+:root {
+  --light-bg: #f5f7fa;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --shadow: rgba(0, 0, 0, 0.04);
+  --primary: #3b82f6;
+  --primary-light: #dbeafe;
+  --text: #111827;
+  --text-secondary: #6b7280;
+}
+
 .user-info-page {
   min-height: 100vh;
   background: var(--light-bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-/* 新的 header 样式 */
+
+/* ===== Header ===== */
 .user-header {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 40px 20px 15px 20px;
-    margin: 0px 5px;
+  padding: 40px 20px 15px;
+  margin: 0 5px;
   background: var(--card-bg);
   border-bottom: 1px solid var(--border);
   border-radius: 0 0 18px 18px;
   box-shadow: 0 2px 8px var(--shadow);
 }
-
 .header-title {
   flex: 1;
   text-align: center;
@@ -131,19 +238,20 @@ onMounted(fetchUserInfo)
   border-radius: 10px;
   padding: 8px 18px;
   font-size: 12px;
-  font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
 }
 .back-btn:hover {
   background: var(--primary);
 }
+
 .user-info-content {
   max-width: 480px;
   margin: 10px auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
+  padding: 0 12px 40px;
 }
 .loading {
   text-align: center;
@@ -151,13 +259,21 @@ onMounted(fetchUserInfo)
   font-size: 18px;
   margin-top: 60px;
 }
-.info-card, .vip-card, .rights-card {
+
+/* ===== 卡片通用 ===== */
+.info-card,
+.plan-card,
+.vip-card,
+.rights-card,
+.asset-card {
   background: var(--card-bg);
   border-radius: 18px;
   box-shadow: 0 5px 20px var(--shadow);
   padding: 24px 28px;
   border: 1px solid var(--border);
 }
+
+/* ===== 基础信息 ===== */
 .info-card {
   display: flex;
   flex-direction: column;
@@ -173,19 +289,54 @@ onMounted(fetchUserInfo)
 .info-row i {
   color: var(--primary);
   font-size: 18px;
+  width: 20px;
+  text-align: center;
 }
 .label {
   color: var(--text-secondary);
-  min-width: 60px;
+  min-width: 100px;
 }
 .value {
   font-weight: 500;
 }
+
+/* ===== 套餐卡片 ===== */
+.plan-card .card-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plan-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+.plan-row:last-child {
+  margin-bottom: 0;
+}
+.plan-row .lab {
+  color: var(--text-secondary);
+  min-width: 100px;
+}
+.plan-row .val {
+  font-weight: 500;
+}
+.text-blue   { color: #3b82f6; }
+.text-green  { color: #10b981; }
+.text-orange { color: #f59e0b; }
+.text-red    { color: #ef4444; }
+
+/* ===== VIP ===== */
 .vip-card {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: flex-start;
   border-left: 6px solid var(--primary);
 }
 .vip-header {
@@ -220,12 +371,10 @@ onMounted(fetchUserInfo)
   color: var(--primary);
   margin-left: 6px;
 }
-.rights-card {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-.rights-title {
+
+/* ===== 权益 / 财产 / 黑名单共用 ===== */
+.rights-title,
+.asset-title {
   font-size: 17px;
   font-weight: 600;
   color: var(--primary);
@@ -233,9 +382,6 @@ onMounted(fetchUserInfo)
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-}
-.rights-title i {
-  color: var(--primary);
 }
 .rights-list {
   display: flex;
@@ -261,6 +407,10 @@ onMounted(fetchUserInfo)
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
+}
+.right-title .highlight {
+  color: var(--primary);
+  margin-left: 6px;
 }
 .right-desc {
   font-size: 13px;
