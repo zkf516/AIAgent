@@ -113,6 +113,9 @@ body {
     align-items: center;
     gap: 8px;
     font-weight: 500;
+    flex-shrink: 1;
+    flex-grow: 0;
+    min-width: 0;
 }
 
 .model-selector i {
@@ -136,6 +139,8 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.3s;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 .tool-btn:hover {

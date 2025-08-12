@@ -18,7 +18,7 @@
     <!-- 主聊天区 -->
     <div class="main-content">
       <div class="top-bar">
-        <div style="display: flex; align-items: center; gap: 5px;">
+        <div class="topbar-left">
           <button class="tool-btn list-toggle-btn" @click="toggleSidebar" title="历史对话">
             <i class="fas fa-bars"></i>
           </button>
@@ -294,8 +294,8 @@ async function getAIReply(conv, aiMsg) {
     content: m.text
   }))
   // 获取当前模型名和 apikey（如有）
-  const model = /*modelStore.currentModel ||*/ 'zhiling_chat'
-  const apiKey = modelStore.apiKey || ''
+  const model = /*modelStore.currentModel ||*/ 'DeepSeek'
+  const apiKey = modelStore.apiKey || 'sk-8063db03ab5749099d809c8967f5c951'
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
     const schema = modelSchemas[model]?.response
@@ -503,5 +503,13 @@ onBeforeUnmount(() => {
 
 .dropdown-item:hover {
   background: var(--primary-light, #f0f4ff);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0; /* 关键，允许子项收缩 */
+  flex: 1 1 0%;
 }
 </style>
