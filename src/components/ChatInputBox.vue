@@ -49,6 +49,7 @@
 
 <script setup>
 import { ref, nextTick, defineProps, defineEmits } from 'vue'
+import { requestCameraPermission, requestMicrophonePermission } from '@/utils/permissions.js'
 
 const props = defineProps({
   input: String,
@@ -88,11 +89,13 @@ function insertNewline(e) {
     });
   }
 }
-function startVoiceInput() {
+async function startVoiceInput() {
+  await requestMicrophonePermission()
   emits('startVoiceInput')
 }
 
-function triggerImageInput() {
+async function triggerImageInput() {
+  await requestCameraPermission()
   imageInput.value.click()
 }
 

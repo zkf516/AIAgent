@@ -1,6 +1,6 @@
 {
   "appId": "com.example.app",
-  "appName": "ai-agent-app",
+  "appName": "智灵联动",
   "webDir": "dist",
   "android": {
     "allowMixedContent": true

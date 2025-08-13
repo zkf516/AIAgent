@@ -153,6 +153,7 @@
 
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { SpeechRecognition as CapSpeechRecognition } from '@capacitor-community/speech-recognition'
 import { useRouter } from 'vue-router'
 import SidebarHistory from '../components/SidebarHistory.vue'
 import ChatInputBox from '../components/ChatInputBox.vue'
@@ -184,36 +185,65 @@ const showDropdown = ref(false)
 const recognizing = ref(false)
 let recognition = null
 
-function initSpeechRecognition() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-  if (!SpeechRecognition) {
-    alert('当前浏览器不支持语音识别')
-    return null
-  }
-  const recog = new SpeechRecognition()
-  recog.lang = 'zh-CN'
-  recog.continuous = false
-  recog.interimResults = false
-  recog.onstart = () => { recognizing.value = true }
-  recog.onend = () => { recognizing.value = false }
-  recog.onerror = (e) => {
-    recognizing.value = false
-    alert('语音识别出错：' + e.error)
-  }
-  recog.onresult = (e) => {
-    const txt = Array.from(e.results).map(r => r[0].transcript).join('')
-    input.value = txt
-  }
-  return recog
+function isCapacitorNative() {
+  return typeof window !== 'undefined' && window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
 }
 
-function startVoiceInput() {
+async function startVoiceInput() {
   if (recognizing.value) {
-    recognition && recognition.stop()
-    return
+    if (recognition && recognition.stop) recognition.stop();
+    recognizing.value = false;
+    return;
   }
-  if (!recognition) recognition = initSpeechRecognition()
-  if (recognition) recognition.start()
+  if (isCapacitorNative()) {
+    // 安卓App用原生插件，直接请求权限
+    try {
+      const req = await CapSpeechRecognition.requestPermission();
+      if (!req.permission) {
+        alert('麦克风权限被拒绝或不可用，请在系统设置中开启权限');
+        return;
+      }
+      recognizing.value = true;
+      const result = await CapSpeechRecognition.start({
+        language: 'zh-CN',
+        maxResults: 1,
+        prompt: '请开始说话',
+        partialResults: false,
+        popup: true
+      });
+      recognizing.value = false;
+      if (result && result.matches && result.matches.length > 0) {
+        input.value = result.matches[0];
+      } else {
+        alert('未识别到语音内容');
+      }
+    } catch (e) {
+      recognizing.value = false;
+      alert('语音识别出错：' + (e && e.message ? e.message : e));
+    }
+    return;
+  }
+  // Web端
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('当前浏览器不支持语音识别');
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.lang = 'zh-CN';
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onstart = () => { recognizing.value = true; };
+  recognition.onend = () => { recognizing.value = false; };
+  recognition.onerror = (e) => {
+    recognizing.value = false;
+    alert('语音识别出错：' + e.error);
+  };
+  recognition.onresult = (e) => {
+    const txt = Array.from(e.results).map(r => r[0].transcript).join('');
+    input.value = txt;
+  };
+  recognition.start();
 }
 
 // showSidebar控制侧边栏显示
