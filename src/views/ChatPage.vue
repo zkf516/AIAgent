@@ -100,7 +100,7 @@
               </div>
               <div class="user-image-action-row">
                 <div class="user-image-thumb">
-                  <img v-if="msg.image" :src="msg.image[0]?.url" alt="用户图片" class="user-thumb-img" />
+                  <img v-if="msg.image" :src="msg.image[0]?.url" class="user-thumb-img" />
                 </div>
                 <div class="message-actions">
                   <button class="action-btn"><i class="fas fa-copy"></i></button>
@@ -314,6 +314,10 @@ async function getAIReply(conv, aiMsg) {
     if (schema.type === 'sse-stream') {
       let content = ''
       for await (const chunk of parseResponseBySchema(schema, response)) {
+        if (chunk.reasoning_content) {
+          if (typeof aiMsg.thought !== 'string') aiMsg.thought = ''
+          aiMsg.thought += chunk.reasoning_content
+        }
         if (chunk.content) {
           content += chunk.content
           aiMsg.text = content

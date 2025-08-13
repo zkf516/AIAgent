@@ -9,7 +9,7 @@
         <div>
           <div class="logo">
             <div class="logo-icon">
-              <i class="fas fa-brain"></i>
+              <img src="/zhiling-logo.svg" alt="logo"/>
             </div>
             <div class="logo-text">智灵联动</div>
           </div>
@@ -109,7 +109,7 @@ function onSidebarAbsTransitionEnd(e) {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 10px 20px;
+    padding: 0 20px 20px;
     border-bottom: 1px solid var(--border);
 }
 
@@ -117,12 +117,12 @@ function onSidebarAbsTransitionEnd(e) {
 .logo-icon {
     width: 38px;
     height: 38px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
+    margin-right: 10px;
 }
 
 .logo-text {
