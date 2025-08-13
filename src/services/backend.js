@@ -74,11 +74,21 @@ export async function* parseResponseBySchema(schema, response) {
             delta = delta?.[seg]
         }
         if (delta) {
-            const result = {}
-            for (const key in schema.fields) {
-                result[key] = delta[schema.fields[key]]
+            if (Array.isArray(delta)) {
+                for (const item of delta) {
+                    const result = {}
+                    for (const key in schema.fields) {
+                        result[key] = item[schema.fields[key]]
+                    }
+                    yield result
+                }
+            } else {
+                const result = {}
+                for (const key in schema.fields) {
+                    result[key] = delta[schema.fields[key]]
+                }
+                yield result
             }
-            yield result
         }
     }
 }

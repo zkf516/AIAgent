@@ -37,9 +37,10 @@
         },
         "response": {
             "type": "json",
-            "jsonPath": "messages[0].content[0]",
+            "jsonPath": "messages[0].content",
             "fields": {
-                "text": "text",
+                "thought": "thought",
+                "text": "finalanswer",
                 "audio": "audio",
                 "image": "image"
             }

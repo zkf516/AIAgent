@@ -62,6 +62,16 @@
             </div>
             <div>
               <div class="message-content">
+                <!-- 思维链 thought 特殊显示 -->
+                <div v-if="msg.thought" class="ai-thought" style="flex-direction:column; align-items:flex-start;">
+                  <div style="width:100%; display:flex; align-items:center;">
+                    <i class="fas fa-lightbulb" style="cursor:pointer;margin-right: 10px;" @click="msg.showThought = !msg.showThought"></i>AI思维链
+                  </div>
+                  <div v-if="msg.showThought" style="width:100%; margin-top:6px;">
+                    <MarkdownRenderer :content="msg.thought" />
+                  </div>
+                </div>
+                <!-- markdown 正文 -->
                 <MarkdownRenderer :content="msg.text" />
                 <div v-if="msg.text === '' && showTyping" class="typing-indicator-in-msg" style="display: flex; align-items: center; gap: 4px;">
                   <span>AI正在思考</span>
@@ -82,12 +92,21 @@
           <template v-else>
             <div>
               <div class="message-content">
+                <div v-if="msg.thought" class="user-thought">
+                  <i class="fas fa-lightbulb"></i>
+                  <span>{{ msg.thought }}</span>
+                </div>
                 <MarkdownRenderer :content="msg.text" />
               </div>
-              <div class="message-actions">
-                <button class="action-btn"><i class="fas fa-copy"></i></button>
-                <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
-                <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
+              <div class="user-image-action-row">
+                <div class="user-image-thumb">
+                  <img v-if="msg.image" :src="msg.image[0]?.url" alt="用户图片" class="user-thumb-img" />
+                </div>
+                <div class="message-actions">
+                  <button class="action-btn"><i class="fas fa-copy"></i></button>
+                  <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
+                  <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
+                </div>
               </div>
             </div>
             <div class="avatar user-avatar">
@@ -149,37 +168,8 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
 
 const router = useRouter()
-const conversations = ref([
-  {
-    id: 1,
-    title: '如何学习React框架？',
-    messages: [
-      { id: 1, role: 'ai', text: '你好！我是DeepSeek AI助手，有什么可以帮您的吗？我可以回答问题、提供建议、协助创作，或者与您讨论各种话题。无论您需要学习新知识、解决技术问题，还是仅仅想聊天，我都在这儿为您服务！' },
-      { id: 2, role: 'user', text: '你好！我正在开发一个网页应用，可以给我一些前端设计的建议吗？' },
-      { id: 3, role: 'ai', text: '当然可以！以下是一些现代网页设计的最佳实践建议：\n\n1. 响应式设计：确保您的网站能在各种设备上良好显示，使用媒体查询和弹性布局（Flexbox/Grid）\n2. 性能优化：优化图片、使用懒加载、最小化CSS/JavaScript文件\n3. 深色模式：提供深色/浅色主题切换，减少眼睛疲劳\n4. 交互动画：添加微妙的动画提升用户体验，但要避免过度使用\n5. 可访问性：确保网站对所有用户友好，包括使用适当对比度和ARIA属性\n\n您有特定的设计风格或功能需求吗？我可以提供更具体的建议。' }
-    ]
-  },
-  {
-    id: 2,
-    title: '解释量子计算基础',
-    messages: []
-  },
-  {
-    id: 3,
-    title: '旅行计划建议',
-    messages: []
-  },
-  {
-    id: 4,
-    title: 'Python数据分析技巧',
-    messages: []
-  },
-  {
-    id: 5,
-    title: '健身计划定制',
-    messages: []
-  }
-])
+import { defaultConversations } from '@/stores/chatData.js'
+const conversations = ref(defaultConversations)
 const activeConvId = ref(1)
 const input = ref('')
 const chatListRef = ref(null)
@@ -276,9 +266,9 @@ async function send() {
   const conv = conversations.value.find(c => c.id === activeConvId.value)
   if (!conv) return
   const userMsgId = Date.now()
-  //console.log(inputImages.value); // 应该是数组
+  console.log(inputImages.value); // 应该是数组
   //console.log(inputImages.value[0]?.base64); // base64 字符串
-  conv.messages.push({ id: userMsgId, role: 'user', text , images: inputImages.value })
+  conv.messages.push({ id: userMsgId, role: 'user', text , image: inputImages.value })
   inputImages.value = []
   scrollToBottom()
   showTyping.value = true
@@ -333,7 +323,11 @@ async function getAIReply(conv, aiMsg) {
     } else {
       // 非流式，直接取一次
       const result = await parseResponseBySchema(schema, response).next()
-      aiMsg.text = result.value?.text || ''
+      if (result.value) {
+        Object.assign(aiMsg, result.value)
+      } else {
+        aiMsg.text = 'AI无回复，请稍后重试。'
+      }
       scrollToBottom()
     }
   } catch (e) {
@@ -393,9 +387,13 @@ function handleClickOutsideDropdown(e) {
 
 
 // === 新增: 模拟来电按钮 ===
+function goPhonecallInfo() {
+  router.push('/phonecall')
+}
 function simulateIncomingCall() {
-  const randomNumber = '1' + Math.floor(Math.random() * 9000000000 + 1000000000)
-  addIncomingCall(randomNumber)
+  // const randomNumber = '1' + Math.floor(Math.random() * 9000000000 + 1000000000)
+  // addIncomingCall(randomNumber)
+  goPhonecallInfo() // 跳转到电话页面
 }
 
 
@@ -535,4 +533,62 @@ const inputImages = ref([])
   min-width: 0; /* 关键，允许子项收缩 */
   flex: 1 1 0%;
 }
+
+/* AI思维链样式 */
+.ai-thought {
+  background: var(--primary-light);
+  color: #999;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  word-break: break-all;
+  white-space: pre-wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.ai-thought .markdown-body {
+  color: #999 !important;
+}
+.ai-image-thumb {
+  margin-bottom: 6px;
+}
+.ai-thumb-img {
+  max-width: 120px;
+  max-height: 80px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+/* 用户思维链样式（如有） */
+.user-thought {
+  background: #e7f7f7;
+  color: #3b6cff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.user-image-action-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.user-image-thumb {
+  margin: 10px;
+}
+.user-thumb-img {
+  max-width: 50px;
+  max-height: 50px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
+
 </style>

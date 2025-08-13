@@ -51,29 +51,29 @@ const greeting = computed(() => {
 })
 
 const assistants = [
-  {
-    name: '海龟汤主持人',
-    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f422.webp',
-    alt: '🐢',
-    desc: '需要自己提供汤面，汤底与关键点'
+   {
+    "name": "微博热搜",
+    "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f525.png",
+    "alt": "🔥",
+    "desc": "实时抓取微博热搜榜，提供话题摘要与舆情洞察"
   },
   {
-    name: '美食评论员🍟',
-    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f60b.webp',
-    alt: '😋',
-    desc: '美食评价专家'
+    "name": "出行规划",
+    "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2708.png",
+    "alt": "✈️",
+    "desc": "一站式行程规划：机票比价、酒店推荐、路线优化与签证提醒"
   },
   {
-    name: '学术写作助手',
-    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f4d8.webp',
-    alt: '📘',
-    desc: '专业的学术研究论文写作和正式文档编写专家'
+    "name": "Twitter 发帖",
+    "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f426.png",
+    "alt": "🐦",
+    "desc": "帮你把中文内容润色、翻译并生成适合 Twitter 的英文推文与话题标签"
   },
   {
-    name: 'Minecraft资深开发者',
-    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/2666-fe0f.webp',
-    alt: '♦️',
-    desc: '擅长高级 Java 开发及 Minecraft 开发'
+    "name": "内容待定",
+    "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2753.png",
+    "alt": "❓",
+    "desc": "占位助手，后续可自由配置"
   }
 ]
 
