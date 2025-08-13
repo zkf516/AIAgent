@@ -49,7 +49,8 @@
 
 <script setup>
 import { ref, nextTick, defineProps, defineEmits } from 'vue'
-import { requestCameraPermission, requestMicrophonePermission } from '@/utils/permissions.js'
+import { requestCameraPermission } from '@/utils/camera.js'
+import { requestMicrophonePermission } from '@/utils/speech.js'
 
 const props = defineProps({
   input: String,
