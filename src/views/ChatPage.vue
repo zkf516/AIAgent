@@ -102,7 +102,9 @@
         <ChatInputBox
           :input="input"
           :recognizing="recognizing"
+          :images="inputImages"
           @update:input="val => { input = val }"
+          @update:images="val => { inputImages = val }"
           @send="send"
           @startVoiceInput="startVoiceInput"
         />
@@ -274,7 +276,10 @@ async function send() {
   const conv = conversations.value.find(c => c.id === activeConvId.value)
   if (!conv) return
   const userMsgId = Date.now()
-  conv.messages.push({ id: userMsgId, role: 'user', text })
+  //console.log(inputImages.value); // 应该是数组
+  //console.log(inputImages.value[0]?.base64); // base64 字符串
+  conv.messages.push({ id: userMsgId, role: 'user', text , images: inputImages.value })
+  inputImages.value = []
   scrollToBottom()
   showTyping.value = true
   input.value = ''
@@ -305,10 +310,12 @@ async function getAIReply(conv, aiMsg) {
       role: lastMsg.role === 'user' ? 'user' : 'assistant',
       content: [
         { username: '张三' },
-        { text: lastMsg.text }
+        { text: lastMsg.text },
+        { image: lastMsg.images[0]?.base64 }
       ]
     }]
   }
+  console.log(messages)
 
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
@@ -403,6 +410,8 @@ onBeforeUnmount(() => {
   removeWebSocketListener(handleWsEvent)
   document.removeEventListener('click', handleClickOutsideDropdown)
 })
+
+const inputImages = ref([])
 
 </script>
 
