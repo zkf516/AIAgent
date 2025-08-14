@@ -1,5 +1,5 @@
 {
-    "DeepSeek-R1": {
+    "deepseek-R1": {
         "request": {
             "url": "https://api.deepseek.com/v1/chat/completions",
             "method": "POST",

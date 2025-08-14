@@ -16,7 +16,7 @@
         :key="m.name"
         class="model-dropdown-item model-item-flex"
         :class="{active: m.name === currentModel}"
-        @click.stop="emit('selectModel', m.name)"
+        @click.stop="emit('selectModel', m)"
       >
         <span class="model-logo-box">
           <template v-if="m.icon && (m.icon.endsWith('.svg') || m.icon.endsWith('.png') || m.icon.startsWith('/') || m.icon.startsWith('http'))">

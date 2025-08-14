@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 export const useModelStore = defineStore('model', () => {
     const models = ref([
-        { name: 'DeepSeek-R1', icon: '/deepseek.svg' },
+        { name: 'deepseek-R1', icon: '/deepseek.svg', apikey: 'sk-8063db03ab5749099d809c8967f5c951'},
         { name: 'gpt-4o-mini', icon: '/openai-logo.svg' },
         { name: 'qwen-max', icon: '/qwen.svg' },
         { name: 'qwen-vl-max', icon: '/qwen.svg' },
@@ -12,10 +12,13 @@ export const useModelStore = defineStore('model', () => {
     ])
     const currentModel = ref(models.value[0].name)
     const showModelDropdown = ref(false)
+    const apikey = ref(models.value[0].apikey)
 
-    function selectModel(name) {
-        currentModel.value = name
+    function selectModel(model) {
+        currentModel.value = model.name
+        apikey.value = model.apikey
         showModelDropdown.value = false
+        console.log('Selected model:', model.name, 'API Key:', model.apikey)
     }
 
     function addModel(model) {

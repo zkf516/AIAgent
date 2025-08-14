@@ -263,11 +263,11 @@ async function send() {
 // 通用获取AI回复，处理流式渲染
 async function getAIReply(conv, aiMsg) {
   // 获取当前模型名和 apikey（如有）
-  const model = modelStore.currentModel || 'DeepSeek-R1'
+  const model = modelStore.currentModel || 'deepseek-R1'
   const apiKey = modelStore.apiKey || 'sk-8063db03ab5749099d809c8967f5c951'
   let messages
   // 构造通用上下文
-  if ( model === 'DeepSeek-R1') {
+  if ( model === 'deepseek-R1') {
     messages = conv.messages.map(m => ({
       role: m.role === 'user' ? 'user' : 'assistant',
       content: m.text
@@ -280,7 +280,7 @@ async function getAIReply(conv, aiMsg) {
       content: [
         { username: '张三' },
         { text: lastMsg.text },
-        { image: lastMsg.images[0]?.base64 }
+        { image: lastMsg.images?.[0]?.base64 }
       ]
     }]
   }
@@ -288,6 +288,7 @@ async function getAIReply(conv, aiMsg) {
 
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
+    console.log('AI回复:', response)
     const schema = modelSchemas[model]?.response
     if (!schema) throw new Error('模型响应结构未配置')
     if (schema.type === 'sse-stream') {
@@ -306,6 +307,7 @@ async function getAIReply(conv, aiMsg) {
     } else {
       // 非流式，直接取一次
       const result = await parseResponseBySchema(schema, response).next()
+      console.log('AI回复:', result.value)
       if (result.value) {
         Object.assign(aiMsg, result.value)
       } else {
