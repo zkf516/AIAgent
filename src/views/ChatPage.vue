@@ -83,9 +83,9 @@
                 </div>
               </div>
               <div class="message-actions">
-                <button class="action-btn"><i class="fas fa-copy"></i></button>
-                <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
-                <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
+                <button class="action-btn" @click="copyText(msg)"><i class="fas fa-copy"></i></button>
+                <button class="action-btn" :class="{ active: msg.liked }" @click="likeMsg(msg)"><i class="fas fa-thumbs-up"></i></button>
+                <button class="action-btn" :class="{ active: msg.disliked }" @click="dislikeMsg(msg)"><i class="fas fa-thumbs-down"></i></button>
               </div>
             </div>
           </template>
@@ -103,9 +103,9 @@
                   <img v-if="msg.image" :src="msg.image[0]?.url" class="user-thumb-img" />
                 </div>
                 <div class="message-actions">
-                  <button class="action-btn"><i class="fas fa-copy"></i></button>
-                  <button class="action-btn"><i class="fas fa-thumbs-up"></i></button>
-                  <button class="action-btn"><i class="fas fa-thumbs-down"></i></button>
+                  <button class="action-btn" @click="copyText(msg)"><i class="fas fa-copy"></i></button>
+                  <button class="action-btn" :class="{ active: msg.liked }" @click="likeMsg(msg)"><i class="fas fa-thumbs-up"></i></button>
+                  <button class="action-btn" :class="{ active: msg.disliked }" @click="dislikeMsg(msg)"><i class="fas fa-thumbs-down"></i></button>
                 </div>
               </div>
             </div>
@@ -395,6 +395,19 @@ onBeforeUnmount(() => {
 })
 
 const inputImages = ref([])
+
+function copyText(msg) {
+  navigator.clipboard.writeText(msg.text)
+  alert('已复制')
+}
+function likeMsg(msg) {
+  msg.liked = !msg.liked
+  if (msg.liked) msg.disliked = false
+}
+function dislikeMsg(msg) {
+  msg.disliked = !msg.disliked
+  if (msg.disliked) msg.liked = false
+}
 
 </script>
 

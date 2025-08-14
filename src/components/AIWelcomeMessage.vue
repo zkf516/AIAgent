@@ -17,8 +17,8 @@
             <i class="fas fa-sync-alt"></i>
           </button>
         </div>
-        <div class="assistants-grid">
-          <div class="assistant-card" v-for="a in assistants" :key="a.name" @mouseenter="hoverCard = a.name" @mouseleave="hoverCard = ''" :style="hoverCard === a.name ? 'transform:translateY(-7px);box-shadow:0 12px 30px rgba(0,0,0,0.4);border-color:rgba(143,148,251,0.4);' : ''">
+        <transition-group name="fade" tag="div" class="assistants-grid">
+          <div class="assistant-card" v-for="a in randomAssistants" :key="a.name" @mouseenter="hoverCard = a.name" @mouseleave="hoverCard = ''" :style="hoverCard === a.name ? 'transform:translateY(-7px);box-shadow:0 12px 30px rgba(0,0,0,0.4);border-color:rgba(143,148,251,0.4);' : ''">
             <a href="#" @click.prevent="onAssistantClick(a)">
               <div class="assistant-avatar">
                 <img :src="a.avatar" :alt="a.alt" />
@@ -29,7 +29,7 @@
               </div>
             </a>
           </div>
-        </div>
+        </transition-group>
         <div class="section-title">
           <h3>大家都在问：</h3>
         </div>
@@ -50,6 +50,7 @@ const greeting = computed(() => {
   return '晚上好'
 })
 
+// 助手列表
 const assistants = [
    {
     "name": "微博热搜",
@@ -74,6 +75,30 @@ const assistants = [
     "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2753.png",
     "alt": "❓",
     "desc": "占位助手，后续可自由配置"
+  },
+  {
+    name: '海龟汤主持人',
+    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f422.webp',
+    alt: '🐢',
+    desc: '需要自己提供汤面，汤底与关键点'
+  },
+  {
+    name: '美食评论员🍟',
+    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f60b.webp',
+    alt: '😋',
+    desc: '美食评价专家'
+  },
+  {
+    name: '学术写作助手',
+    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/1f4d8.webp',
+    alt: '📘',
+    desc: '专业的学术研究论文写作和正式文档编写专家'
+  },
+  {
+    name: 'Minecraft资深开发者',
+    avatar: 'https://registry.npmmirror.com/@lobehub/fluent-emoji-3d/latest/files/assets/2666-fe0f.webp',
+    alt: '♦️',
+    desc: '擅长高级 Java 开发及 Minecraft 开发'
   }
 ]
 
@@ -86,12 +111,18 @@ const questions = [
 
 const hoverCard = ref('')
 
+// 随机显示4个
+function getRandomAssistants(arr, n = 4) {
+  return arr.slice().sort(() => Math.random() - 0.5).slice(0, n)
+}
+const randomAssistants = ref(getRandomAssistants(assistants))
+
 function onCreateAssistant() {
   // 可替换为 emit 事件
   alert('打开创建自定义助手面板')
 }
 function onRefreshAssistants() {
-  alert('刷新助手推荐列表')
+  randomAssistants.value = getRandomAssistants(assistants)
 }
 function onAssistantClick(a) {
   alert(`点击了助手：${a.name}`)
@@ -225,7 +256,7 @@ function onQuestionClick(q) {
 .assistants-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 12px;
+  gap: 7px;
   padding: 10px 0 10px;
 }
 .assistant-card {
@@ -329,5 +360,16 @@ function onQuestionClick(q) {
   .questions-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.fade-move {
+  transition: transform 0.3s;
 }
 </style>

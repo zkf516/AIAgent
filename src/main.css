@@ -260,7 +260,8 @@ body {
     transition: all 0.3s;
 }
 
-.action-btn:hover {
+.action-btn:hover,
+.action-btn.active {
     background: var(--primary);
     color: white;
     border-color: var(--primary);
