@@ -232,7 +232,7 @@ onMounted(() => {
   margin-right: 40px;
 }
 .back-btn {
-  background: linear-gradient(90deg, var(--primary), #5a7dff);
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
   color: #fff;
   border: none;
   border-radius: 10px;

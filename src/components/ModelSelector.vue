@@ -29,7 +29,8 @@
         <span class="model-name-text">{{ m.name }}</span>
       </div>
       <div class="model-dropdown-item add-model" @click.stop="showAddModelDialog = true">
-        <i class="fas fa-plus" style="margin-right:6px;"></i>添加新模型
+        <i class="fas fa-plus" style="margin:5px 15px 5px 5px;"></i>
+        <span>添加新模型</span>
       </div>
     </div>
     <!-- 添加模型弹窗 -->
@@ -111,7 +112,7 @@ function onAddModelSave() {
 }
 
 .model-dropdown-item.add-model {
-  color: #007aff;
+  color: var(--primary);
   font-weight: bold;
   border-top: 1px solid #eee;
   margin-top: 4px;

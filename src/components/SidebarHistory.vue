@@ -30,10 +30,11 @@
             <i class="fas fa-user"></i>
             <span class="menu-text">账户</span>
           </div>
-          <div class="menu-item">
+          <div class="menu-item" @click="goThemeSettings">
             <i class="fas fa-cog"></i>
             <span class="menu-text">设置</span>
           </div>
+
           <div class="menu-item">
             <i class="fas fa-ellipsis-h"></i>
             <span class="menu-text">更多</span>
@@ -48,6 +49,11 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+function goThemeSettings() {
+  router.push('/theme')
+}
 const props = defineProps({
   conversations: Array,
   activeConvId: Number,
@@ -81,6 +87,7 @@ function onSidebarAbsTransitionEnd(e) {
 }
 
 </script>
+
 
 
 <style scoped>
@@ -139,7 +146,7 @@ function onSidebarAbsTransitionEnd(e) {
 
 /* 新对话按钮 */
 .new-chat-btn {
-    background: linear-gradient(90deg, var(--primary), #5a7dff);
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
     color: white;
     border: none;
     border-radius: 12px;
