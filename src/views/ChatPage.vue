@@ -82,10 +82,17 @@
                   </div>
                 </div>
               </div>
-              <div class="message-actions">
-                <button class="action-btn" @click="copyText(msg)"><i class="fas fa-copy"></i></button>
-                <button class="action-btn" :class="{ active: msg.liked }" @click="likeMsg(msg)"><i class="fas fa-thumbs-up"></i></button>
-                <button class="action-btn" :class="{ active: msg.disliked }" @click="dislikeMsg(msg)"><i class="fas fa-thumbs-down"></i></button>
+              <div class="user-audio-action-row">
+                <div  v-if="msg.audio" class="user-audio-thumb">
+                  <audio class="custom-audio" controls preload="none">
+                    <source :src="msg.audio" type="audio/mpeg">
+                  </audio>
+                </div>
+                <div class="message-actions">
+                  <button class="action-btn" @click="copyText(msg)"><i class="fas fa-copy"></i></button>
+                  <button class="action-btn" :class="{ active: msg.liked }" @click="likeMsg(msg)"><i class="fas fa-thumbs-up"></i></button>
+                  <button class="action-btn" :class="{ active: msg.disliked }" @click="dislikeMsg(msg)"><i class="fas fa-thumbs-down"></i></button>
+                </div>
               </div>
             </div>
           </template>
@@ -587,6 +594,27 @@ function dislikeMsg(msg) {
   border-radius: 6px;
   display: flex;
   align-items: center;
+}
+
+.user-audio-action-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.user-audio-thumb {
+  margin: 10px 10px 10px 0px;
+  width: 50%;
+  min-width: 100px;
+  max-width: 70%;
+}
+
+audio.custom-audio {
+  width: 70%;
+  min-width: 250px;
+  margin: 0 0 0 4px;
+  vertical-align: middle;
 }
 
 </style>
