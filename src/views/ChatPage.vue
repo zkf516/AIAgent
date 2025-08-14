@@ -88,6 +88,7 @@
                     <source :src="msg.audio" type="audio/mpeg">
                   </audio>
                 </div>
+                <div class="user-audio-thumb" v-else style="visibility:hidden"></div>
                 <div class="message-actions">
                   <button class="action-btn" @click="copyText(msg)"><i class="fas fa-copy"></i></button>
                   <button class="action-btn" :class="{ active: msg.liked }" @click="likeMsg(msg)"><i class="fas fa-thumbs-up"></i></button>
