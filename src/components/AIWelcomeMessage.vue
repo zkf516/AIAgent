@@ -7,9 +7,23 @@
       <div class="welcome-inner">
         <p class="welcome-desc">我是您的联通智能助理 <b>智灵联动</b>，请问现在能帮您做什么？</p>
         <div class="custom-btn-container">
-          <button class="custom-btn" @click="onCreateAssistant">
+          <button class="custom-btn" @click="showAddPanel = true">
             <span class="plus">+</span> 创建自定义助手
           </button>
+        </div>
+
+        <!-- 添加助手弹窗 -->
+        <div v-if="showAddPanel" class="add-assistant-modal">
+          <div class="add-assistant-content">
+            <h3>创建自定义助手</h3>
+            <label>名称：<input v-model="newAssistant.name" placeholder="请输入助手名称" /></label>
+            <label>图标URL：<input v-model="newAssistant.avatar" placeholder="可选，留空用默认" /></label>
+            <label>描述：<input v-model="newAssistant.desc" placeholder="请输入助手描述" /></label>
+            <div class="add-assistant-actions">
+              <button class="custom-btn" @click="addAssistant">确定添加</button>
+              <button class="custom-btn" style="background:#eee;color:#333;" @click="showAddPanel = false">取消</button>
+            </div>
+          </div>
         </div>
         <div class="section-title">
           <h3>新增助手推荐：</h3>
@@ -51,7 +65,8 @@ const greeting = computed(() => {
 })
 
 // 助手列表
-const assistants = [
+import { reactive } from 'vue'
+const assistants = reactive([
    {
     "name": "微博热搜",
     "avatar": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f525.png",
@@ -100,7 +115,7 @@ const assistants = [
     alt: '♦️',
     desc: '擅长高级 Java 开发及 Minecraft 开发'
   }
-]
+])
 
 const questions = [
   '智灵联动 如何部署和使用？',
@@ -117,10 +132,38 @@ function getRandomAssistants(arr, n = 4) {
 }
 const randomAssistants = ref(getRandomAssistants(assistants))
 
-function onCreateAssistant() {
-  // 可替换为 emit 事件
-  alert('打开创建自定义助手面板')
+const showAddPanel = ref(false)
+const newAssistant = ref({
+  name: '',
+  avatar: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2753.png',
+  alt: '❓',
+  desc: ''
+})
+
+function addAssistant() {
+  if (!newAssistant.value.name) {
+    alert('请输入名称')
+    return
+  }
+  assistants.push({
+    name: newAssistant.value.name,
+    avatar: newAssistant.value.avatar || 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2753.png',
+    alt: '❓',
+    desc: newAssistant.value.desc
+  })
+  // 刷新推荐
+  randomAssistants.value = getRandomAssistants(assistants)
+  // 重置
+  newAssistant.value = {
+    name: '',
+    avatar: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/2753.png',
+    alt: '❓',
+    desc: ''
+  }
+  showAddPanel.value = false
 }
+
+// onCreateAssistant 已被弹窗逻辑替代
 function onRefreshAssistants() {
   randomAssistants.value = getRandomAssistants(assistants)
 }
@@ -131,6 +174,7 @@ function onQuestionClick(q) {
   alert(`您选择了问题: "${q}"`)
 }
 </script>
+
 
 <style scoped>
 /* 欢迎消息主卡片 */
@@ -371,5 +415,46 @@ function onQuestionClick(q) {
 }
 .fade-move {
   transition: transform 0.3s;
+}
+
+/* 添加助手弹窗样式 */
+.add-assistant-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.18);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.add-assistant-content {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 32px 28px 22px 28px;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.add-assistant-content label {
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 6px;
+}
+.add-assistant-content input {
+  margin-top: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
+.add-assistant-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  justify-content: flex-end;
 }
 </style>
