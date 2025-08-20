@@ -262,7 +262,6 @@ async function send() {
   input.value = ''
   // 预添加AI消息
   const aiMsg = reactive({ id: userMsgId + 1, role: 'ai', text: '' })
-  conv.messages.push(aiMsg)
   scrollToBottom()
   // 单独处理AI回复
   getAIReply(conv, aiMsg)
@@ -273,6 +272,7 @@ async function getAIReply(conv, aiMsg) {
   // 获取当前模型名和 apikey（如有）
   const model = modelStore.currentModel || 'deepseek-R1'
   const apiKey = modelStore.apiKey || 'sk-8063db03ab5749099d809c8967f5c951'
+
   let messages
   // 构造通用上下文
   if ( model === 'deepseek-R1') {
@@ -280,6 +280,7 @@ async function getAIReply(conv, aiMsg) {
       role: m.role === 'user' ? 'user' : 'assistant',
       content: m.text
     }))
+    conv.messages.push(aiMsg)
   } else {
     //只发送倒数第二条消息（最新用户输入）
     const lastMsg = conv.messages[conv.messages.length - 2]
@@ -302,6 +303,7 @@ async function getAIReply(conv, aiMsg) {
     if (schema.type === 'sse-stream') {
       let content = ''
       for await (const chunk of parseResponseBySchema(schema, response)) {
+        console.log('SSE chunk:', chunk)
         if (chunk.reasoning_content) {
           if (typeof aiMsg.thought !== 'string') aiMsg.thought = ''
           aiMsg.thought += chunk.reasoning_content
