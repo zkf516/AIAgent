@@ -282,8 +282,8 @@ async function getAIReply(conv, aiMsg) {
     }))
     conv.messages.push(aiMsg)
   } else {
-    //只发送倒数第二条消息（最新用户输入）
-    const lastMsg = conv.messages[conv.messages.length - 2]
+    //只发送最新一条消息（最新用户输入）
+    const lastMsg = conv.messages[conv.messages.length - 1]
     messages = [{
       role: lastMsg.role === 'user' ? 'user' : 'assistant',
       content: [
@@ -292,14 +292,16 @@ async function getAIReply(conv, aiMsg) {
         { image: lastMsg.images?.[0]?.base64 }
       ]
     }]
+    conv.messages.push(aiMsg)
   }
   console.log(messages)
 
   try {
     const response = await sendMessageByModel(model, { apiKey, model, messages })
-    console.log('AI回复:', response)
+    //console.log('AI回复:', response.json())
     const schema = modelSchemas[model]?.response
     if (!schema) throw new Error('模型响应结构未配置')
+    console.log('使用模型响应结构:', schema)
     if (schema.type === 'sse-stream') {
       let content = ''
       for await (const chunk of parseResponseBySchema(schema, response)) {
@@ -319,7 +321,12 @@ async function getAIReply(conv, aiMsg) {
       const result = await parseResponseBySchema(schema, response).next()
       console.log('AI回复:', result.value)
       if (result.value) {
+        // 提取 content 数组中的 finalanswer 或 thought
+        const contentArr = result.value
+        console.log('内容数组:', contentArr)
+        
         Object.assign(aiMsg, result.value)
+        console.log('最终AI消息:', aiMsg)
       } else {
         aiMsg.text = 'AI无回复，请稍后重试。'
       }
@@ -340,9 +347,7 @@ function addConversation() {
   conversations.value.push({
     id: newId,
     title: '新对话',
-    messages: [
-      { id: newId, role: 'ai', text: '您好，有什么可以帮您？' }
-    ]
+    messages: []
   })
   activeConvId.value = newId
   scrollToBottom()

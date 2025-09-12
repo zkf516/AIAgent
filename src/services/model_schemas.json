@@ -26,7 +26,7 @@
     },
     "zhiling-chat": {
         "request": {
-            "url": "http://10.22.61.21:12000/chat",
+            "url": "http://10.21.203.123:12000/chat",
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json"
@@ -37,10 +37,10 @@
         },
         "response": {
             "type": "json",
-            "jsonPath": "messages[0].content",
+            "jsonPath": "messages[0].content[0]",
             "fields": {
                 "thought": "thought",
-                "text": "finalanswer",
+                "text": "text",
                 "audio": "audio",
                 "image": "image"
             }

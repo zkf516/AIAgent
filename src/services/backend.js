@@ -67,12 +67,18 @@ export async function* parseResponseBySchema(schema, response) {
             }
         }
     } else if (schema.type === 'json') {
+        console.log('非流式响应，直接解析 JSON')
+        //console.log('非流式响应:', response.json())
         // 非流式，直接解析 json
         const data = await response.json()
+        console.log("data:",data)
         let delta = data
+        console.log('非流式响应，直接解析 JSON')
         for (const seg of schema.jsonPath.split(/[.\[\]]+/).filter(Boolean)) {
             delta = delta?.[seg]
+            console.log('非流式响应，直接解析 JSON')
         }
+        console.log('Parsed delta:', delta)
         if (delta) {
             if (Array.isArray(delta)) {
                 for (const item of delta) {
@@ -86,6 +92,7 @@ export async function* parseResponseBySchema(schema, response) {
                 const result = {}
                 for (const key in schema.fields) {
                     result[key] = delta[schema.fields[key]]
+                    console.log('字段:', key, '值:', result[key])
                 }
                 yield result
             }

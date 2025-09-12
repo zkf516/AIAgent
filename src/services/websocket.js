@@ -24,13 +24,13 @@ export function connectWebSocket(url = 'ws://localhost:3000') {
     }
 
     ws.onclose = () => {
-        console.log('❌ WebSocket 已关闭，5秒后重连...')
+        //console.log('❌ WebSocket 已关闭，5秒后重连...')
         listeners.forEach(l => l({ type: 'close' }))
         reconnectTimer = setTimeout(() => connectWebSocket(url), 5000)
     }
 
     ws.onerror = (err) => {
-        console.error('WebSocket 错误:', err)
+        //console.error('WebSocket 错误:', err)
         ws.close()
     }
 }
