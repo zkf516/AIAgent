@@ -1,0 +1,33 @@
+{
+    "twitter-mcp": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@enescinar/twitter-mcp"
+        ],
+        "env": {
+            "API_KEY": "",
+            "API_SECRET_KEY": "",
+            "ACCESS_TOKEN": "",
+            "ACCESS_TOKEN_SECRET": ""
+        }
+    },
+    "sqlite": {
+        "command": "uvx",
+        "args": [
+            "mcp-server-sqlite",
+            "--db-path",
+            "users.db"
+        ]
+    },
+    "amap-maps": {
+        "command": "npx",
+        "args": [
+            "-y",
+            "@amap/amap-maps-mcp-server"
+        ],
+        "env": {
+            "AMAP_MAPS_API_KEY": ""
+        }
+    }
+}
