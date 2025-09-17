@@ -61,19 +61,19 @@ Question: {query}
 Thought:
 """
 
-TRAVEL_TOOLS = [{
+TRAVEL_TOOLS = [{    
         "mcpServers": {
-            "amap-maps": {
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@amap/amap-maps-mcp-server"
-                ],
-                "env": {
-                    "AMAP_MAPS_API_KEY": ""
-                }
-            },
-            "variflight": {
+        "amap-maps": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@amap/amap-maps-mcp-server"
+            ],
+            "env": {
+                "AMAP_MAPS_API_KEY": ""
+            }
+        },
+        "variflight": {
             "command": "npx",
             "args": [
                 "-y",
@@ -83,8 +83,8 @@ TRAVEL_TOOLS = [{
                 "VARIFLIGHT_API_KEY": ""
             }
         }
-        }
-    }]
+    }
+}]
 class TravelAgent(FnCallAgent):
     """"""
 
@@ -92,6 +92,7 @@ class TravelAgent(FnCallAgent):
                  llm: Optional[Union[Dict, BaseChatModel]] = None,
                  files: Optional[List[str]] = None,
                  **kwargs):
+        llm = llm if llm else {'model': 'qwen-max'}
         super().__init__(function_list=TRAVEL_TOOLS,
                          llm=llm,
                          system_message=SYSTEM_MESSAGE,

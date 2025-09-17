@@ -26,8 +26,8 @@ def init_agent_service():
         TravelAgent(),
     ]
 
-    # 获取配置文件路径
-    CONFIG_PATH = os.path.join(os.path.join(os.path.dirname(os.path.dirname(__file__)), "mcp"), "mcp_server.json")
+    # 获取配置文件路径 - 修正路径指向src/mcp目录下的配置文件
+    CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "mcp", "mcp_server.json")
 
     # 加载 mcpServers 配置
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:

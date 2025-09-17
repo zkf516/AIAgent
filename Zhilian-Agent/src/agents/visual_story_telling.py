@@ -183,8 +183,9 @@ class VisualStorytelling(Agent):
 
         self.image_agent = Assistant(llm={'model': 'qwen-vl-max'})
 
+        llm_config=self.llm if self.llm else {'model': 'qwen-max'}
         self.writing_agent = Assistant(
-            llm=self.llm,
+            llm=llm_config,
             function_list=function_list,
             system_message='''
             你是一个联通权益分析助手。请基于图片内容，以友好客服的语气分析并分点总结权益。
