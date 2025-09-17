@@ -2002,6 +2002,17 @@ wheels = [
 ]
 
 [[package]]
+name = "npx"
+version = "0.1.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/5f/bedde14c7f0a03af8e1c06a66f3cf4bc44646ce67d1adfa455851e70c2cf/npx-0.1.6-py3-none-any.whl", hash = "sha256:42311219c2af12470c6785f49c366798d67f3583aea18d73c2679d3eb13359a9", size = 10620, upload-time = "2024-06-21T14:46:58.624Z" },
+]
+
+[[package]]
 name = "numpy"
 version = "2.3.2"
 source = { registry = "https://pypi.org/simple" }
@@ -6318,6 +6329,7 @@ dependencies = [
     { name = "flask" },
     { name = "flask-cors" },
     { name = "langchain" },
+    { name = "npx" },
     { name = "pyttsx3" },
     { name = "qwen-agent", extra = ["code-interpreter", "gui", "mcp", "rag"] },
     { name = "requests" },
@@ -6329,6 +6341,7 @@ requires-dist = [
     { name = "flask", specifier = ">=3.1.1" },
     { name = "flask-cors", specifier = ">=6.0.1" },
     { name = "langchain", specifier = ">=0.3.27" },
+    { name = "npx", specifier = ">=0.1.6" },
     { name = "pyttsx3", specifier = ">=2.99" },
     { name = "qwen-agent", extras = ["code-interpreter", "gui", "mcp", "rag"], specifier = ">=0.0.29" },
     { name = "requests", specifier = ">=2.32.4" },

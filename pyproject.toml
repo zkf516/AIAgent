@@ -8,6 +8,7 @@ dependencies = [
     "flask>=3.1.1",
     "flask-cors>=6.0.1",
     "langchain>=0.3.27",
+    "npx>=0.1.6",
     "pyttsx3>=2.99",
     "qwen-agent[code-interpreter,gui,mcp,rag]>=0.0.29",
     "requests>=2.32.4",
