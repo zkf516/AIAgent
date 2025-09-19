@@ -6,8 +6,8 @@
             "@enescinar/twitter-mcp"
         ],
         "env": {
-            "API_KEY": "xMttzjvzvSLg6BeMsvDIK2Xr5",
-            "API_SECRET_KEY": "HacBadurZVidZxm5TEDSChyIMaiKck6pRfSPmWEqYJX9sP4T4R",
+            "API_KEY": "",
+            "API_SECRET_KEY": "",
             "ACCESS_TOKEN": "",
             "ACCESS_TOKEN_SECRET": ""
         }

@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import logging
 
 import click
 import httpx
@@ -20,8 +21,8 @@ from a2a.types import (
 )
 from dotenv import load_dotenv
 
-from app.agent import CurrencyAgent
-from app.agent_executor import CurrencyAgentExecutor
+from .agent import CurrencyAgent
+from .agent_executor import CurrencyAgentExecutor
 
 
 load_dotenv()

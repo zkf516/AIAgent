@@ -11,65 +11,47 @@ from qwen_agent.llm.schema import ContentItem, Message
 os.environ['DASHSCOPE_API_KEY'] = 'sk-9c01fc7d757e45619045bfadaea8b249'
 os.environ['GRADIO_SERVER_PORT'] = '12000'
 
+# 槽位配置
+slot_config = {
+    "图像分析": {
+        "image_count": "用户上传的图片数量",
+        "analysis_target": "需要分析的具体内容（如文字、物体、场景等）"
+    },
+    "图像生成": {
+        "prompt": "生成图片的文本描述",
+        "style": "图片风格（如卡通、写实、油画等）",
+        "size": "图片尺寸（如1024x1024）"
+    },
+    "语音合成": {
+        "text": "需要转换为语音的文本",
+        "voice_type": "声音类型（如男声、女声）",
+        "speed": "语速（如慢速、正常、快速）"
+    },
+    "电话处理": {
+        "phone_number": "电话号码",
+        "call_action": "通话操作类型（如拨打、挂断、查询）",
+        "context": "通话上下文（如通话内容、通话时间、通话地点等）"
+    },
+    "数据库查询": {
+        "query": "SQL 查询语句",
+        "database": "数据库名称",
+        "table": "表名"
+    },
+    "代码执行": {
+        "language": "编程语言",
+        "code": "需要执行的代码内容"
+    },
+    "一般对话": {
+        "topic": "对话主题（如天气、闲聊、新闻等）"
+    },
+    "权益分析": {
+        "benefit_type": "权益类型（如流量包、会员、积分等）",
+        "valid_period": "有效期",
+        "conditions": "使用条件"
+    }
+}
 
-class IntentRecognition():
-    """意图识别 + 槽位填充 Agent（带槽位配置 + JSON 校验）"""
-    # name = '意图识别'
-    # description = '根据根据用户输入进行意图识别'
-    # parameters = [{
-    #     'name': 'prompt',
-    #     'type': 'string',
-    #     'description': '据用户输入',
-    #     'required': True
-    # }]
-
-    def __init__(self, llm: Optional[Union[Dict, BaseChatModel]] = None):
-        super().__init__()
-        self.llm = llm
-        # 槽位配置
-        slot_config = {
-            "图像分析": {
-                "image_count": "用户上传的图片数量",
-                "analysis_target": "需要分析的具体内容（如文字、物体、场景等）"
-            },
-            "图像生成": {
-                "prompt": "生成图片的文本描述",
-                "style": "图片风格（如卡通、写实、油画等）",
-                "size": "图片尺寸（如1024x1024）"
-            },
-            "语音合成": {
-                "text": "需要转换为语音的文本",
-                "voice_type": "声音类型（如男声、女声）",
-                "speed": "语速（如慢速、正常、快速）"
-            },
-            "电话处理": {
-                "phone_number": "电话号码",
-                "call_action": "通话操作类型（如拨打、挂断、查询）",
-                "context": "通话上下文（如通话内容、通话时间、通话地点等）"
-            },
-            "数据库查询": {
-                "query": "SQL 查询语句",
-                "database": "数据库名称",
-                "table": "表名"
-            },
-            "代码执行": {
-                "language": "编程语言",
-                "code": "需要执行的代码内容"
-            },
-            "一般对话": {
-                "topic": "对话主题（如天气、闲聊、新闻等）"
-            },
-            "权益分析": {
-                "benefit_type": "权益类型（如流量包、会员、积分等）",
-                "valid_period": "有效期",
-                "conditions": "使用条件"
-            }
-        }
-
-        # 意图识别+槽位填充 LLM
-        self.intent_agent = Assistant(
-            llm=self.llm,
-            system_message=f'''
+system_message = f'''
 你是一个智能意图识别助手，任务是从用户输入中识别意图并提取对应槽位（slot filling）。
 
 意图类型：
@@ -90,8 +72,22 @@ class IntentRecognition():
     }}
 }}
 4. 不要输出除 JSON 外的任何内容。
-            '''
-        )
+'''
+
+class IntentRecognition(Assistant):
+    """意图识别 + 槽位填充 Agent（带槽位配置 + JSON 校验）"""
+    # name = '意图识别'
+    # description = '根据根据用户输入进行意图识别'
+    # parameters = [{
+    #     'name': 'prompt',
+    #     'type': 'string',
+    #     'description': '据用户输入',
+    #     'required': True
+    # }]
+
+    def __init__(self, llm: Optional[Union[Dict, BaseChatModel]] = None):
+        super().__init__(llm=llm, system_message=system_message)
+
 
     def _extract_json(self, text: str) -> Optional[dict]:
         """用正则提取 JSON，并解析为 dict"""
@@ -121,7 +117,7 @@ class IntentRecognition():
                 intent_message[-1]['content'] = [ContentItem(text=f'用户输入：{user_text}')]
 
             # 调用 LLM
-            for rsp in self.intent_agent.run(intent_message, lang=lang, **kwargs):
+            for rsp in self.run(intent_message, lang=lang, **kwargs):
                 if rsp and isinstance(rsp[-1]['content'], str):
                     parsed = self._extract_json(rsp[-1]['content'])
                     if parsed:
